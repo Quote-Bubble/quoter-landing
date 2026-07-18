@@ -1,7 +1,8 @@
 ---
-// Visible "children" of the hero blob: small saturated blue orbs drifting
-// at the edges of the white zones, so the blue atmosphere never fully
-// leaves the page. Decorative only — sits behind all section content.
+// Children of the hero blob — each one is literally a soft-edged cutout
+// sampled from the same artwork (bg-v3.webp), so hue and character match
+// the hero exactly. Organic asymmetric shapes, each rotated differently,
+// drifting slowly. Decorative only — behind all section content.
 ---
 
 <div class="blob-field" aria-hidden="true">
@@ -21,77 +22,86 @@
 
   .bf {
     position: absolute;
-    width: var(--s, 420px);
-    height: var(--s, 420px);
-    background: radial-gradient(
-      circle at 50% 50%,
-      var(--c1) 0%,
-      var(--c2) 45%,
-      transparent 72%
-    );
-    filter: blur(34px);
+    width: var(--w, 420px);
+    height: var(--h, 340px);
+    background-image: url("/bg-v3.webp");
+    background-repeat: no-repeat;
+    background-size: var(--bs, 1500px) auto;
+    background-position: var(--bp, -450px -300px);
+    /* Asymmetric organic silhouette — no two alike, nothing circular */
+    border-radius: var(--br, 62% 38% 54% 46% / 44% 58% 42% 56%);
+    filter: blur(26px) saturate(1.12);
+    opacity: 0.9;
+    transform: rotate(var(--rot, 0deg));
     /* Rasterized once, then drifts on the compositor only */
     will-change: transform;
-    animation: bf-drift var(--d, 11s) ease-in-out var(--dl, 0s) infinite;
+    animation: bf-drift var(--d, 12s) ease-in-out var(--dl, 0s) infinite;
   }
 
-  /* Left edge, beside the how-it-works cards */
+  /* Left edge, beside the how-it-works cards — samples the cloud's left core */
   .b1 {
-    --s: 500px;
-    --c1: rgba(47, 107, 255, 0.62);
-    --c2: rgba(79, 139, 255, 0.32);
-    --d: 12s;
-    left: -170px;
+    --w: 500px;
+    --h: 400px;
+    --bp: -430px -290px;
+    --rot: -10deg;
+    --d: 13s;
+    left: -190px;
     top: 46%;
   }
-  /* Right edge, lower how-it-works */
+  /* Right edge, lower how-it-works — samples the dense center of the cloud */
   .b2 {
-    --s: 380px;
-    --c1: rgba(31, 87, 240, 0.55);
-    --c2: rgba(47, 107, 255, 0.26);
-    --d: 10s;
+    --w: 380px;
+    --h: 300px;
+    --bp: -760px -420px;
+    --br: 45% 55% 62% 38% / 56% 44% 58% 42%;
+    --rot: 12deg;
+    --d: 10.5s;
     --dl: -3s;
-    right: -130px;
+    right: -150px;
     top: 62%;
   }
-  /* Right edge, behind the footer CTA */
+  /* Right edge, behind the footer CTA — samples the deep-blue hills */
   .b3 {
-    --s: 460px;
-    --c1: rgba(79, 139, 255, 0.6);
-    --c2: rgba(47, 107, 255, 0.3);
-    --d: 13s;
+    --w: 460px;
+    --h: 370px;
+    --bp: -520px -2420px;
+    --br: 55% 45% 40% 60% / 60% 42% 58% 40%;
+    --rot: -7deg;
+    --d: 14s;
     --dl: -6s;
-    right: -150px;
+    right: -170px;
     top: 83%;
   }
-  /* Small one at the page's final corner */
+  /* Small one at the page's final corner — samples the cyan cloud edge */
   .b4 {
-    --s: 320px;
-    --c1: rgba(47, 107, 255, 0.5);
-    --c2: rgba(79, 139, 255, 0.24);
-    --d: 9s;
+    --w: 320px;
+    --h: 250px;
+    --bp: -300px -250px;
+    --br: 58% 42% 48% 52% / 42% 60% 40% 58%;
+    --rot: 18deg;
+    --d: 9.5s;
     --dl: -2s;
-    left: -110px;
+    left: -120px;
     top: 91%;
   }
 
   @keyframes bf-drift {
     0%,
     100% {
-      transform: translate3d(0, -16px, 0);
+      transform: rotate(var(--rot, 0deg)) translate3d(0, -14px, 0);
     }
     50% {
-      transform: translate3d(0, 20px, 0);
+      transform: rotate(var(--rot, 0deg)) translate3d(0, 18px, 0);
     }
   }
 
   @media (max-width: 640px) {
     .bf {
-      filter: blur(26px);
+      filter: blur(20px) saturate(1.12);
     }
-    .b1 { --s: 310px; left: -130px; }
-    .b2 { --s: 250px; right: -105px; }
-    .b3 { --s: 290px; right: -115px; }
+    .b1 { --w: 320px; --h: 260px; --bs: 1000px; --bp: -290px -195px; left: -140px; }
+    .b2 { --w: 250px; --h: 200px; --bs: 1000px; --bp: -500px -280px; right: -110px; }
+    .b3 { --w: 290px; --h: 235px; --bs: 1000px; --bp: -350px -1610px; right: -125px; }
     .b4 { display: none; }
   }
 
