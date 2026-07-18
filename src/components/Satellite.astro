@@ -543,11 +543,11 @@ void main() {
   float n = large * 0.5 + midN * 0.35 + fine * 0.15;
   /* Slightly brighter toward the top so it matches the washed blob edge */
   vec3 sky = mix(u_colorMid, u_colorBottom, uv.y * 0.55);
-  float cover = smoothstep(0.24, 0.46, n);
-  float peaks = smoothstep(0.37, 0.6, n);
-  float clouds = clamp(cover * 1.0 + peaks * 0.9, 0.0, 1.0);
+  float cover = smoothstep(0.28, 0.5, n);
+  float peaks = smoothstep(0.42, 0.65, n);
+  float clouds = clamp(cover * 0.9 + peaks * 0.7, 0.0, 1.0);
   /* Soften cloud intensity near the top handoff into the blob */
-  clouds *= mix(0.68, 1.0, smoothstep(0.0, 0.45, uv.y));
+  clouds *= mix(0.55, 1.0, smoothstep(0.0, 0.45, uv.y));
   gl_FragColor = vec4(mix(sky, u_colorTop, clouds), 1.0);
 }
 `;
