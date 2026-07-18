@@ -392,13 +392,24 @@ main {
   animation: load-fade-up 0.7s var(--ease-out-expo) 0.12s both;
 }
 
-/* Satellite sky fades in — no scale (scaling a masked layer reads as a box) */
+/* Satellite sky materializes on PAGE LOAD (not on scroll) — a slow, soft
+   rise-and-clear that sequences in after the hero blob. By the time the
+   user scrolls down, the clouds are already there and already moving, so
+   nothing heavy kicks in mid-scroll. No scale (scaling a masked layer
+   reads as a box). */
+@keyframes sky-load {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 30px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
 [data-sat] .sat-panel-bg {
   opacity: 0;
-  transition: opacity 1.25s var(--ease-out-soft);
-}
-[data-sat].is-in .sat-panel-bg {
-  opacity: 1;
+  animation: sky-load 2.2s var(--ease-out-soft) 0.85s forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -425,6 +436,7 @@ main {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+    animation: none !important;
   }
   .how-card.is-in .how-badge,
   .how-card.is-in .how-icon {
