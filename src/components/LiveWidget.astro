@@ -150,6 +150,15 @@ const presets = ["12 Oakfield Road, Leeds", "4 Elm Grove, Bristol", "27 Hillside
     .q {
       border-radius: 20px;
       padding: 12px;
+      /* Glassier on mobile: more translucent so the blob frosts through */
+      background: rgba(255, 255, 255, 0.38);
+      backdrop-filter: blur(26px) saturate(1.9);
+      -webkit-backdrop-filter: blur(26px) saturate(1.9);
+      border-color: rgba(255, 255, 255, 0.55);
+    }
+    .q-search {
+      background: rgba(255, 255, 255, 0.78);
+      border-color: rgba(255, 255, 255, 0.85);
     }
     .q-search {
       display: grid;
