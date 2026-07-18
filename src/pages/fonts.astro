@@ -1,63 +1,89 @@
 ---
 // Internal font-comparison gallery. Not linked from anywhere.
-// Fonts imported here are bundled only into this page.
+// Round 3 — Instrument Sans flagged; more in that soft-modern lane.
 import Layout from "../layouts/Layout.astro";
-import "@fontsource-variable/space-grotesk";
-import "@fontsource-variable/sora";
-import "@fontsource-variable/gabarito";
-import "@fontsource/dm-serif-display";
-import "@fontsource-variable/bitter";
-import "@fontsource-variable/unbounded";
+import "@fontsource-variable/instrument-sans/wght.css";
+import "@fontsource-variable/outfit/wght.css";
+import "@fontsource-variable/onest/wght.css";
+import "@fontsource-variable/figtree/wght.css";
+import "@fontsource-variable/plus-jakarta-sans/wght.css";
+import "@fontsource-variable/epilogue/wght.css";
+import "@fontsource-variable/syne/wght.css";
+import "@fontsource-variable/urbanist/wght.css";
+import "@fontsource/dm-sans/latin-500.css";
+import "@fontsource-variable/bricolage-grotesque/wght.css";
 
 const candidates = [
   {
-    name: "Poppins Light (current)",
-    family: "'Poppins', sans-serif",
-    weight: 300,
+    name: "Instrument Sans",
+    family: "'Instrument Sans Variable', sans-serif",
+    weight: 520,
+    spacing: "-0.025em",
+    note: "Your pick so far. Soft geometric with a handmade edge.",
+    flagged: true,
+  },
+  {
+    name: "Figtree",
+    family: "'Figtree Variable', sans-serif",
+    weight: 550,
     spacing: "-0.02em",
-    note: "The one you have now. Clean and geometric, but reads startupy.",
+    note: "Closest neighbor to Instrument Sans — friendly, rounded, modern without going cute.",
   },
   {
-    name: "Space Grotesk",
-    family: "'Space Grotesk Variable', sans-serif",
+    name: "Outfit",
+    family: "'Outfit Variable', sans-serif",
     weight: 500,
-    spacing: "-0.03em",
-    note: "Modern with quirky letter details. Techy personality without being cold.",
+    spacing: "-0.025em",
+    note: "Slightly cleaner/rounder. Soft product feel with a bit more warmth than Inter.",
   },
   {
-    name: "Sora",
-    family: "'Sora Variable', sans-serif",
-    weight: 460,
-    spacing: "-0.03em",
-    note: "Confident and slightly sci-fi. Feels engineered, fits the satellite story.",
+    name: "Onest",
+    family: "'Onest Variable', sans-serif",
+    weight: 550,
+    spacing: "-0.025em",
+    note: "Geometric with subtle oddness in the curves. Modern, a little more character.",
   },
   {
-    name: "Gabarito",
-    family: "'Gabarito Variable', sans-serif",
+    name: "Plus Jakarta Sans",
+    family: "'Plus Jakarta Sans Variable', sans-serif",
+    weight: 560,
+    spacing: "-0.02em",
+    note: "Polished and contemporary. A touch more “designed brand” than Instrument.",
+  },
+  {
+    name: "DM Sans",
+    family: "'DM Sans', sans-serif",
+    weight: 500,
+    spacing: "-0.02em",
+    note: "Low-contrast geometric. Quiet personality — less quirky, still not sterile.",
+  },
+  {
+    name: "Urbanist",
+    family: "'Urbanist Variable', sans-serif",
+    weight: 520,
+    spacing: "-0.03em",
+    note: "Tall, airy, a bit fashion-forward. More attitude in the proportions.",
+  },
+  {
+    name: "Epilogue",
+    family: "'Epilogue Variable', sans-serif",
+    weight: 540,
+    spacing: "-0.02em",
+    note: "Soft terminals and open shapes. Friendly modern — closer to Instrument’s warmth.",
+  },
+  {
+    name: "Syne",
+    family: "'Syne Variable', sans-serif",
     weight: 600,
     spacing: "-0.02em",
-    note: "Warm, friendly, human. The least corporate of the bunch.",
+    note: "The wilder option in this lane. Distinctive, artsy, still readable as a headline.",
   },
   {
-    name: "Bitter (slab serif)",
-    family: "'Bitter Variable', serif",
-    weight: 550,
-    spacing: "-0.015em",
-    note: "Sturdy and dependable. Tradesman solidity, right for roofing.",
-  },
-  {
-    name: "DM Serif Display",
-    family: "'DM Serif Display', serif",
-    weight: 400,
-    spacing: "0",
-    note: "Editorial and established. Feels like a company that has been around.",
-  },
-  {
-    name: "Unbounded",
-    family: "'Unbounded Variable', sans-serif",
-    weight: 420,
-    spacing: "-0.02em",
-    note: "The loudest option. Very distinctive, borderline futuristic.",
+    name: "Bricolage Grotesque",
+    family: "'Bricolage Grotesque Variable', sans-serif",
+    weight: 560,
+    spacing: "-0.03em",
+    note: "Kept from round 2 — more oddball than Instrument if you want to push further.",
   },
 ];
 ---
@@ -65,16 +91,23 @@ const candidates = [
 <Layout title="Font lab | Quoter" description="Internal font comparison.">
   <main class="relative z-10 mx-auto max-w-4xl px-6 py-20">
     <h1 class="text-[14px] font-semibold uppercase tracking-[0.14em] text-brand-600">
-      Font lab · hero headline candidates
+      Font lab · round 3
     </h1>
-    <p class="mt-2 text-[15px] text-ink-soft">
-      Same headline, same sub, different personality. Scroll and compare.
+    <p class="mt-2 max-w-xl text-[15px] text-ink-soft">
+      Instrument Sans is flagged. Everything else is in a similar soft-modern lane — pick neighbors or something with more bite.
     </p>
 
     <div class="mt-10 flex flex-col gap-6">
       {candidates.map((f) => (
-        <section class="font-card rounded-3xl p-8 sm:p-10">
-          <p class="text-[12.5px] font-semibold uppercase tracking-[0.1em] text-brand-600">{f.name}</p>
+        <section class:list={["font-card rounded-3xl p-8 sm:p-10", f.flagged && "font-card--flagged"]}>
+          <div class="flex flex-wrap items-center gap-2">
+            <p class="text-[12.5px] font-semibold uppercase tracking-[0.1em] text-brand-600">{f.name}</p>
+            {f.flagged && (
+              <span class="rounded-full bg-brand-600 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-white">
+                Flagged
+              </span>
+            )}
+          </div>
           <p class="mt-0.5 text-[13px] text-muted">{f.note}</p>
           <h2
             class="mt-5 text-ink"
@@ -101,5 +134,11 @@ const candidates = [
     -webkit-backdrop-filter: blur(18px);
     border: 1px solid rgba(255, 255, 255, 0.75);
     box-shadow: var(--shadow-soft);
+  }
+  .font-card--flagged {
+    border-color: rgba(47, 107, 255, 0.45);
+    box-shadow:
+      0 0 0 1px rgba(47, 107, 255, 0.12),
+      var(--shadow-soft);
   }
 </style>
