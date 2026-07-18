@@ -316,7 +316,12 @@ const presets = ["12 Oakfield Road, Leeds", "4 Elm Grove, Bristol", "27 Hillside
     function revealCard() {
       requestAnimationFrame(() => {
         const overflow = card.getBoundingClientRect().bottom - window.innerHeight;
-        if (overflow > -16) window.scrollBy({ top: overflow + 28, behavior: "smooth" });
+        if (overflow > -16) {
+          const lenis = (window as any).__lenis;
+          const delta = overflow + 28;
+          if (lenis) lenis.scrollTo(window.scrollY + delta);
+          else window.scrollBy({ top: delta, behavior: "smooth" });
+        }
       });
     }
 

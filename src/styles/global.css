@@ -86,6 +86,36 @@ main {
   max-width: 100%;
 }
 
+/* Lenis smooth-scroll support: when Lenis drives the scroll it must own the
+   curve, so native CSS smoothing steps aside */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* Touch feel: no grey tap flash, no double-tap-zoom delay on controls */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+button,
+a,
+input {
+  touch-action: manipulation;
+}
+
+/* Below-fold sections skip layout/paint work until they approach the
+   viewport — pure render savings, pixels identical when visible */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 720px;
+}
+
 /* Gradient wallpaper — absolute (not fixed) so it's inked onto the page and
    scrolls with it. The band geometry is constant: nothing here is anchored to
    content, so the widget opening/closing can never resize or move the blob.

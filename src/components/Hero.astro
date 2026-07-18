@@ -138,7 +138,14 @@ import LiveWidget from "./LiveWidget.astro";
     if (!card) return;
     document.querySelectorAll("[data-try]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        card.scrollIntoView({ behavior: "smooth", block: "center" });
+        const lenis = (window as any).__lenis;
+        if (lenis) {
+          // Center the card in the viewport on Lenis's own curve
+          const offset = -Math.max(0, (window.innerHeight - card.offsetHeight) / 2);
+          lenis.scrollTo(card, { offset });
+        } else {
+          card.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
         const input = card.querySelector("[data-input]") as HTMLInputElement | null;
         window.setTimeout(() => input?.focus({ preventScroll: true }), 500);
       });

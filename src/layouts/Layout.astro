@@ -26,6 +26,8 @@ const {
     <meta property="og:type" content="website" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="theme-color" content="#ffffff" />
+    <!-- The blob is the page's visual anchor — fetch it before the CSS asks -->
+    <link rel="preload" as="image" href="/bg-v3.webp" fetchpriority="high" />
   </head>
   <body>
     <div class="site-bg" aria-hidden="true"></div>
@@ -41,6 +43,48 @@ const {
     <SpeedInsights />
   </body>
 </html>
+
+<script>
+  // Lenis smooth scrolling — a soft ease-out curve on wheel scrolling.
+  // Desktop-feel only: touch keeps native momentum (hijacking touch feels
+  // wrong on phones). Skipped entirely for reduced-motion users.
+  import Lenis from "lenis";
+
+  declare global {
+    interface Window {
+      __lenis?: Lenis;
+    }
+  }
+
+  function initLenis() {
+    if (window.__lenis) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const lenis = new Lenis({
+      duration: 1.1,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    });
+    window.__lenis = lenis;
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    // Anchor links ride the same curve
+    document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
+      a.addEventListener("click", (e) => {
+        const target = document.querySelector(a.hash);
+        if (!target) return;
+        e.preventDefault();
+        lenis.scrollTo(target as HTMLElement, { offset: -24 });
+      });
+    });
+  }
+  initLenis();
+  document.addEventListener("astro:after-swap", initLenis);
+</script>
 
 <script>
   // Scroll-triggered reveals — transform/opacity only, one observer for the page.
