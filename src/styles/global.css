@@ -289,12 +289,17 @@ input {
   to   { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 @keyframes load-line {
-  from { opacity: 0; transform: translate3d(0, 110%, 0); }
-  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+  from { opacity: 0; transform: translate3d(0, 110%, 0); filter: blur(7px); }
+  60%  { filter: blur(2px); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); filter: blur(0); }
 }
-@keyframes load-blob {
-  from { opacity: 0; transform: translateX(-50%) scale(0.92); }
-  to   { opacity: 1; transform: translateX(-50%) scale(1); }
+/* Blob BLOOM: born as a small, dense, saturated orb (scaling the soft
+   gradient down concentrates its colour), then blooms outward to rest.
+   Transform/opacity only — compositor-cheap even on the big layer. */
+@keyframes load-bloom {
+  0%   { opacity: 0; transform: translateX(-50%) scale(0.3); }
+  30%  { opacity: 1; }
+  100% { opacity: 1; transform: translateX(-50%) scale(1); }
 }
 @keyframes load-dots {
   from { opacity: 0; }
@@ -305,11 +310,12 @@ input {
   opacity: 0;
   animation: load-fade-up 0.95s var(--ease-out-expo) forwards;
 }
+/* Cascade re-timed to follow the bloom's light outward */
 .delay-1 { animation-delay: 0.1s; }
 .delay-2 { animation-delay: 0.22s; }
-.delay-3 { animation-delay: 0.36s; }
-.delay-4 { animation-delay: 0.5s; }
-.delay-5 { animation-delay: 0.66s; }
+.delay-3 { animation-delay: 0.85s; }
+.delay-4 { animation-delay: 1s; }
+.delay-5 { animation-delay: 1.15s; }
 
 /* Nav drops in first */
 .nav-load {
@@ -329,25 +335,26 @@ input {
   opacity: 0;
   animation: load-line 1.05s var(--ease-out-expo) forwards;
 }
-.hero-line:nth-child(1) .hero-line-inner { animation-delay: 0.18s; }
-.hero-line:nth-child(2) .hero-line-inner { animation-delay: 0.32s; }
+.hero-line:nth-child(1) .hero-line-inner { animation-delay: 0.5s; }
+.hero-line:nth-child(2) .hero-line-inner { animation-delay: 0.66s; }
 
-/* Widget rises into place with a soft blur clear */
+/* Widget locks in last, once the bloom has settled */
 .widget-load {
   opacity: 0;
-  animation: load-rise 1.15s var(--ease-out-expo) 0.55s forwards;
+  animation: load-rise 1.05s var(--ease-out-expo) 1.1s forwards;
 }
 
-/* Atmosphere enters with the page */
+/* Atmosphere blooms in first — everything else reveals through its light */
 .site-bg {
   opacity: 0;
-  transform-origin: center 40%;
+  /* Origin sits on the blob's core so it blooms from its own heart */
+  transform-origin: center 42%;
   /* keep translateX(-50%) from base so load anim doesn't un-center the blob */
-  animation: load-blob 1.4s var(--ease-out-soft) 0.12s forwards;
+  animation: load-bloom 1.55s var(--ease-out-expo) 0.1s forwards;
 }
 .site-dots {
   opacity: 0;
-  animation: load-dots 1.2s ease 0.3s forwards;
+  animation: load-dots 1.2s ease 1.05s forwards;
 }
 
 /* —— Scroll reveals —— */
@@ -439,7 +446,7 @@ input {
 }
 [data-sat] .sat-panel-bg {
   opacity: 0;
-  animation: sky-load 2.2s var(--ease-out-soft) 0.85s forwards;
+  animation: sky-load 2.2s var(--ease-out-soft) 1.35s forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {

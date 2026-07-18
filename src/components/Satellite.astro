@@ -701,10 +701,12 @@ void main() {
         return;
       }
 
-      // Run from page load — the clouds are already alive before the user
-      // ever scrolls, so nothing heavy spins up mid-scroll. Only pause when
-      // the tab itself is hidden.
-      if (!document.hidden) start();
+      // Run from page load — but let the hero bloom own the GPU for its
+      // first beat, then warm the clouds (still long before the user can
+      // scroll down to them). Only pause when the tab itself is hidden.
+      window.setTimeout(() => {
+        if (!document.hidden) start();
+      }, 1500);
 
       document.addEventListener(
         "visibilitychange",
