@@ -30,12 +30,35 @@
     background-position: var(--bp, -450px -300px);
     /* Asymmetric organic silhouette — no two alike, nothing circular */
     border-radius: var(--br, 62% 38% 54% 46% / 44% 58% 42% 56%);
-    filter: blur(26px) saturate(1.12);
-    opacity: 0.9;
+    /* Heavier blur so they melt into the page like the hero's atmosphere */
+    filter: blur(34px) saturate(1.12);
+    opacity: 0;
     transform: rotate(var(--rot, 0deg));
-    /* Rasterized once, then drifts on the compositor only */
-    will-change: transform;
-    animation: bf-drift var(--d, 12s) ease-in-out var(--dl, 0s) infinite;
+    /* Rasterized once; breathing/drift run on the compositor only */
+    will-change: transform, opacity;
+    animation:
+      bf-born 1.6s var(--ease-out-soft) calc(1.2s + var(--dl, 0s) * -0.1) forwards,
+      bf-live var(--d, 12s) ease-in-out var(--dl, 0s) infinite;
+  }
+
+  /* Born out of the page as the bloom settles */
+  @keyframes bf-born {
+    to {
+      opacity: 0.85;
+    }
+  }
+
+  /* Alive: a slow squish-breathe with a rotation wobble riding the drift —
+     the shape genuinely changes silhouette as it moves, transform-only */
+  @keyframes bf-live {
+    0%,
+    100% {
+      transform: rotate(var(--rot, 0deg)) translate3d(0, -14px, 0) scale(1.05, 0.95);
+    }
+    50% {
+      transform: rotate(calc(var(--rot, 0deg) + 6deg)) translate3d(0, 20px, 0)
+        scale(0.94, 1.06);
+    }
   }
 
   /* Left edge, beside the how-it-works cards — samples the cloud's left core */
@@ -85,15 +108,6 @@
     top: 91%;
   }
 
-  @keyframes bf-drift {
-    0%,
-    100% {
-      transform: rotate(var(--rot, 0deg)) translate3d(0, -14px, 0);
-    }
-    50% {
-      transform: rotate(var(--rot, 0deg)) translate3d(0, 18px, 0);
-    }
-  }
 
   @media (max-width: 640px) {
     .bf {
@@ -108,6 +122,8 @@
   @media (prefers-reduced-motion: reduce) {
     .bf {
       animation: none;
+      /* Must still land visible without the born animation */
+      opacity: 0.85;
     }
   }
 </style>

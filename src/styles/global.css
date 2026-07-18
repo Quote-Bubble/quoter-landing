@@ -323,7 +323,8 @@ input {
   animation: load-fade-down 0.8s var(--ease-out-expo) 0.05s forwards;
 }
 
-/* Hero headline: clip-reveal each line */
+/* Hero headline: words tumble up out of each line's clip one by one,
+   rotating slightly and clearing from blur as they land */
 .hero-line {
   display: block;
   overflow: hidden;
@@ -332,16 +333,68 @@ input {
 }
 .hero-line-inner {
   display: block;
-  opacity: 0;
-  animation: load-line 1.05s var(--ease-out-expo) forwards;
 }
-.hero-line:nth-child(1) .hero-line-inner { animation-delay: 0.5s; }
-.hero-line:nth-child(2) .hero-line-inner { animation-delay: 0.66s; }
+.hw {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(1em) rotate(4deg);
+  transform-origin: 0% 100%;
+  filter: blur(8px);
+  animation: word-in 0.95s var(--ease-out-expo) calc(0.42s + var(--wi, 0) * 0.085s) forwards;
+}
+@keyframes word-in {
+  55% {
+    filter: blur(1.5px);
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+    filter: blur(0);
+  }
+}
 
-/* Widget locks in last, once the bloom has settled */
+/* Subtext: rises with a skew that irons itself flat */
+.sub-load {
+  opacity: 0;
+  transform: translateY(26px) skewY(1.6deg);
+  animation: sub-in 1s var(--ease-out-expo) 0.95s forwards;
+}
+@keyframes sub-in {
+  to {
+    opacity: 1;
+    transform: translateY(0) skewY(0);
+  }
+}
+
+/* CTAs: spring-pop with a little overshoot, one after the other */
+.cta-load > * {
+  opacity: 0;
+  transform: translateY(16px) scale(0.75);
+  animation: cta-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.cta-load > *:nth-child(1) { animation-delay: 1.02s; }
+.cta-load > *:nth-child(2) { animation-delay: 1.14s; }
+@keyframes cta-pop {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Widget: lands like a sheet of glass laid onto the page — tilts in from
+   a slight 3D pitch, settling flat as it arrives */
 .widget-load {
   opacity: 0;
-  animation: load-rise 1.05s var(--ease-out-expo) 1.1s forwards;
+  transform: perspective(1200px) rotateX(16deg) translateY(48px) scale(0.96);
+  transform-origin: center top;
+  animation: widget-land 1.15s var(--ease-out-expo) 1.15s forwards;
+}
+@keyframes widget-land {
+  to {
+    opacity: 1;
+    transform: perspective(1200px) rotateX(0deg) translateY(0) scale(1);
+  }
 }
 
 /* Atmosphere blooms in first — everything else reveals through its light */
@@ -454,12 +507,16 @@ input {
   .animate-in,
   .nav-load,
   .hero-line-inner,
+  .hw,
+  .sub-load,
+  .cta-load > *,
   .widget-load,
   .site-bg,
   .site-dots {
     animation: none !important;
     opacity: 1 !important;
     filter: none !important;
+    transform: none !important;
   }
   .site-bg {
     transform: translateX(-50%) !important;
