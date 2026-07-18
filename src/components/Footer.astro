@@ -3,7 +3,8 @@ import Logo from "./Logo.astro";
 const year = new Date().getFullYear();
 ---
 
-<section class="cv-auto relative mx-auto max-w-3xl px-4 pt-6 pb-20 text-center sm:px-6 sm:pt-8 sm:pb-28" data-reveal="scale">
+<!-- final CTA -->
+<section class="cv-auto relative mx-auto max-w-3xl px-4 pt-6 pb-16 text-center sm:px-6 sm:pt-8 sm:pb-20" data-reveal="scale">
   <h2 class="font-display text-[clamp(1.7rem,6vw,2.8rem)] leading-[1.06] text-ink">
     Find out what your roof will cost.
   </h2>
@@ -23,8 +24,10 @@ const year = new Date().getFullYear();
   </button>
 </section>
 
-<footer class="relative border-t border-line" data-reveal data-delay="1">
-  <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+<!-- giant-brand footer: links float above a huge ghost wordmark that sinks
+     into a deepening blue, closing the page inside the brand atmosphere -->
+<footer class="footer-giant relative">
+  <div class="relative z-10 mx-auto max-w-6xl px-4 pt-12 sm:px-6 sm:pt-16">
     <div class="flex flex-col items-center justify-between gap-5 sm:flex-row">
       <a href="/" class="flex items-center gap-2.5" aria-label="Quoter home">
         <Logo size={26} />
@@ -34,10 +37,46 @@ const year = new Date().getFullYear();
         <a href="#how" class="transition-colors hover:text-ink">How it works</a>
         <a href="mailto:hello@quoter.app" class="transition-colors hover:text-ink">Contact</a>
       </nav>
-      <p class="text-[13px] text-muted">© {year} Quoter</p>
+      <p class="text-[13px] text-ink-soft">© {year} Quoter</p>
     </div>
-    <p class="mt-6 text-center text-[12px] text-muted sm:text-left">
+    <p class="mt-5 text-center text-[12px] text-ink-soft">
       Prices shown are ballpark figures. A qualified local roofer confirms every quote.
     </p>
   </div>
+
+  <div data-reveal="fade">
+    <div class="giant-word" aria-hidden="true">QUOTER</div>
+  </div>
 </footer>
+
+<style>
+  .footer-giant {
+    overflow: hidden;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0) 0%,
+      #eaf1ff 24%,
+      #bcd4ff 55%,
+      #7dabff 82%,
+      #4f8bff 100%
+    );
+  }
+
+  .giant-word {
+    margin-top: clamp(1.25rem, 4vw, 3rem);
+    font-family: var(--font-sans);
+    font-weight: 830;
+    font-size: clamp(3.4rem, 18.5vw, 21rem);
+    line-height: 0.75;
+    letter-spacing: -0.045em;
+    text-align: center;
+    white-space: nowrap;
+    color: #ffffff;
+    opacity: 0.85;
+    user-select: none;
+    pointer-events: none;
+    /* Sink the baseline below the page edge so the word is cropped by the
+       bottom of the site, like it continues beyond the screen */
+    transform: translateY(0.12em);
+  }
+</style>
