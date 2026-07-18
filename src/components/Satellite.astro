@@ -233,15 +233,17 @@ const roofPath =
     display: block;
     pointer-events: none;
   }
-  /* Soft deepen under copy — lighter so it still matches the blob */
+  /* Deep blue scrim under the copy zone: clouds can drift behind the text
+     but can never get bright enough there to wash the white type out */
   .sat-panel-bg::after {
     content: "";
     position: absolute;
     inset: 0;
     background: radial-gradient(
-      ellipse 42% 55% at 24% 48%,
-      rgba(20, 60, 180, 0.35) 0%,
-      rgba(31, 87, 240, 0.12) 50%,
+      ellipse 48% 62% at 24% 48%,
+      rgba(16, 48, 150, 0.62) 0%,
+      rgba(24, 70, 200, 0.35) 45%,
+      rgba(31, 87, 240, 0.1) 70%,
       transparent 100%
     );
     pointer-events: none;
@@ -249,10 +251,11 @@ const roofPath =
   @media (max-width: 640px) {
     .sat-panel-bg::after {
       background: radial-gradient(
-        ellipse 90% 55% at 50% 28%,
-        rgba(20, 60, 180, 0.4) 0%,
-        rgba(31, 87, 240, 0.14) 50%,
-        transparent 75%
+        ellipse 95% 58% at 50% 28%,
+        rgba(16, 48, 150, 0.62) 0%,
+        rgba(24, 70, 200, 0.35) 45%,
+        rgba(31, 87, 240, 0.1) 70%,
+        transparent 80%
       );
     }
   }
@@ -294,8 +297,9 @@ const roofPath =
   .sat-copy h2,
   .sat-copy p {
     text-shadow:
-      0 1px 2px rgba(5, 20, 70, 0.5),
-      0 6px 32px rgba(5, 20, 70, 0.7);
+      0 1px 2px rgba(5, 20, 70, 0.55),
+      0 2px 14px rgba(5, 20, 70, 0.7),
+      0 8px 36px rgba(5, 20, 70, 0.85);
   }
   .sat-label {
     color: #eef4ff;
