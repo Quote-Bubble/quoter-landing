@@ -558,6 +558,7 @@ void main() {
     [1.0, 1.0, 1.0],                  // bright cloud tops
   ];
   const CLOUD_VER = "blob-4";
+  const FRAME_MS = 1000 / 24;
 
   function preferCssOnly(): boolean {
     const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
@@ -596,39 +597,6 @@ void main() {
         return;
       }
       canvas.dataset.cloudVer = CLOUD_VER;
-
-      // ——— Device-adaptive quality ———
-      // Static signals (memory, cores, GPU name) pick a starting tier:
-      //   3 = strong: sharper clouds (1.25x) at 30fps
-      //   2 = typical: 1x at 24fps
-      //   1 = weak: 0.7x at 18fps
-      // A runtime governor then steps quality down if real frame times
-      // still blow the budget, so every device ends where it can hold.
-      const navX = navigator as Navigator & { deviceMemory?: number };
-      const mem = navX.deviceMemory ?? 4;
-      const cores = navigator.hardwareConcurrency ?? 4;
-      let renderer = "";
-      const dbg = gl.getExtension("WEBGL_debug_renderer_info");
-      if (dbg) renderer = String(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) || "");
-
-      let tier: number;
-      if (/swiftshader|software|llvmpipe/i.test(renderer) || mem <= 2) {
-        tier = 1;
-      } else {
-        let score = 0;
-        if (mem >= 8) score += 2;
-        else if (mem >= 4) score += 1;
-        if (cores >= 8) score += 2;
-        else if (cores >= 4) score += 1;
-        if (/apple m\d|rtx|geforce|radeon/i.test(renderer)) score += 1;
-        tier = score >= 4 ? 3 : score >= 2 ? 2 : 1;
-      }
-
-      let resCap = tier === 3 ? 1.25 : tier === 2 ? 1 : 0.7;
-      let frameMs = tier === 3 ? 1000 / 30 : tier === 2 ? 1000 / 24 : 1000 / 18;
-      let slowStreak = 0;
-      let downgrades = 0;
-      canvas.dataset.tier = String(tier);
 
       const compile = (type: number, src: string) => {
         const s = gl.createShader(type);
@@ -682,10 +650,9 @@ void main() {
       const t0 = performance.now();
 
       const resize = () => {
-        // Clouds are soft-focus: rendering under native res and letting the
-        // compositor upscale is indistinguishable for fbm noise. The cap is
-        // the device tier's resolution budget.
-        const dpr = Math.min(window.devicePixelRatio || 1, resCap);
+        // Clouds are soft-focus: render at 1x and let the compositor upscale.
+        // Indistinguishable for fbm noise, ~4x fewer shaded pixels on retina.
+        const dpr = Math.min(window.devicePixelRatio || 1, 1);
         const rect = host.getBoundingClientRect();
         const w = Math.max(1, Math.floor(rect.width * dpr));
         const h = Math.max(1, Math.floor(rect.height * dpr));
@@ -703,22 +670,7 @@ void main() {
 
       const loop = (now: number) => {
         if (!running) return;
-        const interval = now - lastFrame;
-        if (interval >= frameMs) {
-          // Governor: repeated intervals at 2x budget mean the device can't
-          // hold this tier. Step resolution and framerate down (max twice).
-          if (lastFrame && interval > frameMs * 2) {
-            if (++slowStreak >= 12 && downgrades < 2) {
-              slowStreak = 0;
-              downgrades++;
-              resCap = Math.max(0.5, resCap * 0.75);
-              frameMs = Math.min(1000 / 15, frameMs * 1.25);
-              canvas.dataset.tier = `${tier}-down${downgrades}`;
-              resize();
-            }
-          } else if (slowStreak > 0) {
-            slowStreak--;
-          }
+        if (now - lastFrame >= FRAME_MS) {
           lastFrame = now;
           draw(now);
         }
