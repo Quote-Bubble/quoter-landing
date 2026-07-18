@@ -1,0 +1,105 @@
+---
+// Internal font-comparison gallery. Not linked from anywhere.
+// Fonts imported here are bundled only into this page.
+import Layout from "../layouts/Layout.astro";
+import "@fontsource-variable/space-grotesk";
+import "@fontsource-variable/sora";
+import "@fontsource-variable/gabarito";
+import "@fontsource/dm-serif-display";
+import "@fontsource-variable/bitter";
+import "@fontsource-variable/unbounded";
+
+const candidates = [
+  {
+    name: "Poppins Light (current)",
+    family: "'Poppins', sans-serif",
+    weight: 300,
+    spacing: "-0.02em",
+    note: "The one you have now. Clean and geometric, but reads startupy.",
+  },
+  {
+    name: "Space Grotesk",
+    family: "'Space Grotesk Variable', sans-serif",
+    weight: 500,
+    spacing: "-0.03em",
+    note: "Modern with quirky letter details. Techy personality without being cold.",
+  },
+  {
+    name: "Sora",
+    family: "'Sora Variable', sans-serif",
+    weight: 460,
+    spacing: "-0.03em",
+    note: "Confident and slightly sci-fi. Feels engineered, fits the satellite story.",
+  },
+  {
+    name: "Gabarito",
+    family: "'Gabarito Variable', sans-serif",
+    weight: 600,
+    spacing: "-0.02em",
+    note: "Warm, friendly, human. The least corporate of the bunch.",
+  },
+  {
+    name: "Bitter (slab serif)",
+    family: "'Bitter Variable', serif",
+    weight: 550,
+    spacing: "-0.015em",
+    note: "Sturdy and dependable. Tradesman solidity, right for roofing.",
+  },
+  {
+    name: "DM Serif Display",
+    family: "'DM Serif Display', serif",
+    weight: 400,
+    spacing: "0",
+    note: "Editorial and established. Feels like a company that has been around.",
+  },
+  {
+    name: "Unbounded",
+    family: "'Unbounded Variable', sans-serif",
+    weight: 420,
+    spacing: "-0.02em",
+    note: "The loudest option. Very distinctive, borderline futuristic.",
+  },
+];
+---
+
+<Layout title="Font lab | Quoter" description="Internal font comparison.">
+  <main class="relative z-10 mx-auto max-w-4xl px-6 py-20">
+    <h1 class="text-[14px] font-semibold uppercase tracking-[0.14em] text-brand-600">
+      Font lab · hero headline candidates
+    </h1>
+    <p class="mt-2 text-[15px] text-ink-soft">
+      Same headline, same sub, different personality. Scroll and compare.
+    </p>
+
+    <div class="mt-10 flex flex-col gap-6">
+      {candidates.map((f) => (
+        <section class="font-card rounded-3xl p-8 sm:p-10">
+          <p class="text-[12.5px] font-semibold uppercase tracking-[0.1em] text-brand-600">{f.name}</p>
+          <p class="mt-0.5 text-[13px] text-muted">{f.note}</p>
+          <h2
+            class="mt-5 text-ink"
+            style={`font-family:${f.family};font-weight:${f.weight};letter-spacing:${f.spacing};font-size:clamp(2rem,5.4vw,3.6rem);line-height:1.05;`}
+          >
+            Instant Roof Quotes,<br />Not Site Visits.
+          </h2>
+          <p class="mt-4 max-w-lg text-[15.5px] leading-relaxed text-ink-soft">
+            Type in your address and Quoter measures your roof from satellite
+            photos, giving you a
+            <strong class="font-semibold text-brand-600">free estimate</strong>
+            in seconds.
+          </p>
+        </section>
+      ))}
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .font-card {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    box-shadow: var(--shadow-soft);
+  }
+</style>
