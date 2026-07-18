@@ -1,5 +1,13 @@
 ---
 import LiveWidget from "./LiveWidget.astro";
+
+// Headline split to the LETTER so each character can resolve individually,
+// with one continuous index driving the wave across both lines.
+const lines = ["Instant Roof Quotes,", "Not Site Visits."];
+let li = 0;
+const heroLines = lines.map((line) =>
+  line.split(" ").map((word) => word.split("").map((ch) => ({ ch, i: li++ })))
+);
 ---
 
 <!--
@@ -7,25 +15,28 @@ import LiveWidget from "./LiveWidget.astro";
   in the first screen on desktop and mobile.
 -->
 <section class="hero relative flex min-h-[100svh] flex-col">
+  <!-- Sonar pulse: rings burst from the blob's heart and birth the page -->
+  <div class="pulse-rings" aria-hidden="true"><i></i><i></i></div>
+
   <div
     class="hero-stage relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-5 text-center sm:px-6"
   >
     <div class="hero-cluster w-full">
       <h1 class="font-display hero-title mx-auto max-w-4xl text-ink">
-        <span class="hero-line">
-          <span class="hero-line-inner">
-            <span class="hw" style="--wi:0">Instant</span>
-            <span class="hw" style="--wi:1">Roof</span>
-            <span class="hw" style="--wi:2">Quotes,</span>
+        {heroLines.map((words) => (
+          <span class="hero-line">
+            {words.map((letters, wi) => (
+              <Fragment>
+                <span class="hword">
+                  {letters.map((l) => (
+                    <span class="hl" style={`--li:${l.i}`}>{l.ch}</span>
+                  ))}
+                </span>
+                {wi < words.length - 1 ? " " : ""}
+              </Fragment>
+            ))}
           </span>
-        </span>
-        <span class="hero-line">
-          <span class="hero-line-inner">
-            <span class="hw" style="--wi:3">Not</span>
-            <span class="hw" style="--wi:4">Site</span>
-            <span class="hw" style="--wi:5">Visits.</span>
-          </span>
-        </span>
+        ))}
       </h1>
 
       <p class="sub-load hero-sub mx-auto max-w-xl leading-relaxed text-ink-soft">
@@ -53,14 +64,113 @@ import LiveWidget from "./LiveWidget.astro";
         </a>
       </div>
 
-      <div class="hero-widget mx-auto w-full max-w-[620px] widget-load">
-        <LiveWidget />
+      <div class="hero-widget relative mx-auto w-full max-w-[620px]">
+        <!-- The widget is traced into existence, the way it traces roofs -->
+        <svg class="widget-trace" aria-hidden="true">
+          <rect pathLength="100"></rect>
+        </svg>
+        <div class="widget-load">
+          <LiveWidget />
+        </div>
       </div>
     </div>
   </div>
 </section>
 
 <style>
+  /* —— Sonar pulse rings: burst from the blob core, birthing the page —— */
+  .pulse-rings {
+    position: absolute;
+    left: 50%;
+    top: 64%;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .pulse-rings i {
+    position: absolute;
+    left: -120px;
+    top: -120px;
+    width: 240px;
+    height: 240px;
+    border: 2px solid rgba(47, 107, 255, 0.55);
+    border-radius: 50%;
+    opacity: 0;
+    transform: scale(0.12);
+    animation: ring-pulse 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .pulse-rings i:nth-child(1) {
+    animation-delay: 0.4s;
+  }
+  .pulse-rings i:nth-child(2) {
+    animation-delay: 0.72s;
+    border-width: 1.5px;
+  }
+  @keyframes ring-pulse {
+    0% {
+      opacity: 0;
+      transform: scale(0.12);
+    }
+    12% {
+      opacity: 0.6;
+    }
+    100% {
+      opacity: 0;
+      transform: scale(7);
+    }
+  }
+
+  /* —— Widget trace: a glowing measurement line draws the widget's
+        outline, then the glass materializes inside it —— */
+  .widget-trace {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0;
+    animation: trace-life 1.55s linear 1s forwards;
+  }
+  .widget-trace rect {
+    x: 1.5px;
+    y: 1.5px;
+    width: calc(100% - 3px);
+    height: calc(100% - 3px);
+    rx: 27px;
+    fill: none;
+    stroke: #2f6bff;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    filter: drop-shadow(0 0 9px rgba(47, 107, 255, 0.85));
+    animation: trace-draw 0.9s var(--ease-out-expo) 1.05s forwards;
+  }
+  @media (max-width: 520px) {
+    .widget-trace rect {
+      rx: 21px;
+    }
+  }
+  @keyframes trace-life {
+    0% { opacity: 0; }
+    6% { opacity: 1; }
+    72% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  @keyframes trace-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pulse-rings,
+    .widget-trace {
+      display: none;
+    }
+  }
+
   .hero-stage {
     justify-content: center;
     padding-top: max(5.75rem, calc(env(safe-area-inset-top, 0px) + 4.5rem));
