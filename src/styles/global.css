@@ -1,15 +1,21 @@
 @import "tailwindcss";
-@import "@fontsource-variable/inter";
-@import "@fontsource-variable/fraunces";
-@import "@fontsource/poppins/300.css";
-@import "@fontsource/poppins/400.css";
+/* Latin-only faces — ~70KB total instead of ~225KB full family packs */
+@font-face {
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("@fontsource-variable/inter/files/inter-latin-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@import "@fontsource/poppins/latin-300.css";
 
 /* ---------------------------------------------------------------
    Quoter design tokens — Billow-inspired: light, editorial, blue.
 ---------------------------------------------------------------- */
 @theme {
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-serif: "Fraunces Variable", ui-serif, Georgia, "Times New Roman", serif;
+  --font-serif: ui-serif, Georgia, "Times New Roman", serif;
   --font-display: "Poppins", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
 
   /* Neutrals */
@@ -83,10 +89,12 @@ body {
   background-repeat: no-repeat;
   background-position: center 300px;
   background-size: cover;
-  filter: blur(30px);
+  /* Soft pre-blurred art — keep runtime blur modest (30px was a compositor tax) */
+  filter: blur(14px);
   -webkit-mask-image: linear-gradient(to bottom, #000 50%, transparent 84%);
   mask-image: linear-gradient(to bottom, #000 50%, transparent 84%);
   pointer-events: none;
+  contain: paint;
 }
 
 /* Really faint dot-matrix for a touch of texture/depth */
@@ -169,26 +177,6 @@ body {
   position: relative;
 }
 
-/* Frosted-glass card so the gradient shows through */
-.glass {
-  background: rgba(255, 255, 255, 0.62);
-  backdrop-filter: blur(18px) saturate(1.35);
-  -webkit-backdrop-filter: blur(18px) saturate(1.35);
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  box-shadow:
-    0 1px 2px rgba(10, 11, 13, 0.03),
-    0 18px 40px -24px rgba(23, 60, 160, 0.28);
-}
-.glass-hover {
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
-}
-.glass-hover:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    0 2px 4px rgba(10, 11, 13, 0.04),
-    0 28px 56px -22px rgba(23, 60, 160, 0.4);
-}
-
 /* Small uppercase section label */
 .section-label {
   display: inline-flex;
@@ -227,8 +215,8 @@ body {
   to   { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 @keyframes load-rise {
-  from { opacity: 0; transform: translate3d(0, 48px, 0) scale(0.96); filter: blur(8px); }
-  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0); }
+  from { opacity: 0; transform: translate3d(0, 36px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 @keyframes load-line {
   from { opacity: 0; transform: translate3d(0, 110%, 0); }
@@ -296,9 +284,8 @@ body {
   opacity: 0;
   transform: translate3d(0, 36px, 0);
   transition:
-    opacity 1s var(--ease-out-expo),
-    transform 1s var(--ease-out-expo);
-  will-change: opacity, transform;
+    opacity 0.7s var(--ease-out-expo),
+    transform 0.7s var(--ease-out-expo);
 }
 [data-reveal="left"]  { transform: translate3d(-40px, 18px, 0); }
 [data-reveal="right"] { transform: translate3d(40px, 18px, 0); }
@@ -364,20 +351,13 @@ body {
   animation: load-fade-up 0.7s var(--ease-out-expo) 0.12s both;
 }
 
-/* Satellite sky soft-scales as the section lands */
-[data-sat] .sat-panel-bg,
-[data-sat] .sat-panel-blur {
+/* Satellite sky fades in — no scale (scaling a masked layer reads as a box) */
+[data-sat] .sat-panel-bg {
   opacity: 0;
-  transform: scale(0.94);
-  transition:
-    opacity 1.25s var(--ease-out-soft),
-    transform 1.25s var(--ease-out-soft);
-  transform-origin: center center;
+  transition: opacity 1.25s var(--ease-out-soft);
 }
-[data-sat].is-in .sat-panel-bg,
-[data-sat].is-in .sat-panel-blur {
+[data-sat].is-in .sat-panel-bg {
   opacity: 1;
-  transform: scale(1);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -395,8 +375,7 @@ body {
   }
   [data-reveal],
   [data-stagger] > *,
-  [data-sat] .sat-panel-bg,
-  [data-sat] .sat-panel-blur {
+  [data-sat] .sat-panel-bg {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
