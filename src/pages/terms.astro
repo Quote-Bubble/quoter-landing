@@ -1,0 +1,75 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+  title="Terms of Service | Quoter"
+  description="The terms for using Quoter's free roof estimates."
+>
+  <main class="relative z-10 mx-auto max-w-2xl px-6 py-20 sm:py-24">
+    <div class="legal-panel rounded-3xl p-7 sm:p-10">
+      <a href="/" class="text-[14px] font-medium text-brand-600 hover:underline">&larr; Back to Quoter</a>
+
+      <h1 class="font-display mt-5 text-[clamp(1.9rem,5vw,2.6rem)] leading-[1.05] text-ink">
+        Terms of Service
+      </h1>
+      <p class="mt-2 text-[13px] text-muted">Last updated: July 2026</p>
+
+      <h2>What Quoter is</h2>
+      <p>
+        Quoter gives you a free estimate for roofing work. You type in an
+        address, we look at satellite imagery of the property, and we show you
+        an estimated price range for the work.
+      </p>
+
+      <h2>Estimates are not final quotes</h2>
+      <p>
+        Every price Quoter shows you is a ballpark figure. It is there to help
+        you plan and budget. It is not a contract, an offer, or a final price.
+        A qualified local roofer confirms the exact price after inspecting the
+        property, and only that confirmed price counts.
+      </p>
+
+      <h2>Using Quoter</h2>
+      <p>
+        Quoter is free to use. You agree to only request estimates for
+        properties you own or have a genuine interest in, and not to use the
+        service in a way that disrupts it for others.
+      </p>
+
+      <h2>Accuracy</h2>
+      <p>
+        We work hard to make estimates useful, but satellite measurements and
+        regional pricing have limits. We cannot guarantee accuracy, and we are
+        not responsible for decisions made on the basis of an estimate alone.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        Questions about these terms: <a href="mailto:hello@quoter.app" class="text-brand-600 hover:underline">hello@quoter.app</a>
+      </p>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .legal-panel {
+    background: rgba(255, 255, 255, 0.86);
+    backdrop-filter: blur(20px) saturate(1.3);
+    -webkit-backdrop-filter: blur(20px) saturate(1.3);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: var(--shadow-float);
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-size: 19px;
+    color: var(--color-ink);
+    margin-top: 1.9rem;
+  }
+  p {
+    margin-top: 0.6rem;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--color-ink-soft);
+  }
+</style>

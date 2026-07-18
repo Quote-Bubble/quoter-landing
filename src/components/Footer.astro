@@ -1,5 +1,4 @@
 ---
-import Logo from "./Logo.astro";
 const year = new Date().getFullYear();
 ---
 
@@ -24,28 +23,24 @@ const year = new Date().getFullYear();
   </button>
 </section>
 
-<!-- giant-brand footer: links float above a huge ghost wordmark that sinks
-     into a deepening blue, closing the page inside the brand atmosphere -->
+<!-- giant-brand footer: the wordmark stands alone over the deepening blue,
+     with the legal strip sitting cleanly beneath it -->
 <footer class="footer-giant relative">
   <div class="relative z-10 mx-auto max-w-6xl px-4 pt-12 sm:px-6 sm:pt-16">
-    <div class="flex flex-col items-center justify-between gap-5 sm:flex-row">
-      <a href="/" class="flex items-center gap-2.5" aria-label="Quoter home">
-        <Logo size={26} />
-        <span class="text-[16px] font-semibold text-ink">Quoter</span>
-      </a>
-      <nav class="flex items-center gap-7 text-[14px] text-ink-soft">
-        <a href="#how" class="transition-colors hover:text-ink">How it works</a>
-        <a href="mailto:hello@quoter.app" class="transition-colors hover:text-ink">Contact</a>
-      </nav>
-      <p class="text-[13px] text-ink-soft">© {year} Quoter</p>
-    </div>
-    <p class="mt-5 text-center text-[12px] text-ink-soft">
-      Prices shown are ballpark figures. A qualified local roofer confirms every quote.
-    </p>
+    <nav class="flex items-center justify-center gap-8 text-[14px] text-ink-soft">
+      <a href="#how" class="transition-colors hover:text-ink">How it works</a>
+      <a href="mailto:hello@quoter.app" class="transition-colors hover:text-ink">Contact</a>
+    </nav>
   </div>
 
   <div data-reveal="fade">
     <div class="giant-word" aria-hidden="true">QUOTER</div>
+  </div>
+
+  <div class="footer-legal">
+    <a href="/terms">Terms of Service</a>
+    <a href="/privacy">Privacy Policy</a>
+    <span>© {year} Quoter. All rights reserved.</span>
   </div>
 </footer>
 
@@ -67,7 +62,7 @@ const year = new Date().getFullYear();
     font-family: var(--font-sans);
     font-weight: 830;
     font-size: clamp(3.4rem, 18.5vw, 21rem);
-    line-height: 0.75;
+    line-height: 0.9;
     letter-spacing: -0.045em;
     text-align: center;
     white-space: nowrap;
@@ -75,8 +70,31 @@ const year = new Date().getFullYear();
     opacity: 0.85;
     user-select: none;
     pointer-events: none;
-    /* Sink the baseline below the page edge so the word is cropped by the
-       bottom of the site, like it continues beyond the screen */
-    transform: translateY(0.12em);
+  }
+
+  /* Legal strip: sits cleanly beneath the wordmark and closes the page */
+  .footer-legal {
+    position: relative;
+    z-index: 5;
+    background: linear-gradient(180deg, #4f8bff 0%, #2f6bff 100%);
+    padding: 15px 20px calc(15px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px 26px;
+    text-align: center;
+    font-size: 12.5px;
+  }
+  .footer-legal a {
+    color: rgba(255, 255, 255, 0.92);
+    transition: color 0.15s ease;
+  }
+  .footer-legal a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+  }
+  .footer-legal span {
+    color: rgba(255, 255, 255, 0.75);
   }
 </style>

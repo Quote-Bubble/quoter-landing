@@ -1,0 +1,73 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+  title="Privacy Policy | Quoter"
+  description="How Quoter handles the information you give it."
+>
+  <main class="relative z-10 mx-auto max-w-2xl px-6 py-20 sm:py-24">
+    <div class="legal-panel rounded-3xl p-7 sm:p-10">
+      <a href="/" class="text-[14px] font-medium text-brand-600 hover:underline">&larr; Back to Quoter</a>
+
+      <h1 class="font-display mt-5 text-[clamp(1.9rem,5vw,2.6rem)] leading-[1.05] text-ink">
+        Privacy Policy
+      </h1>
+      <p class="mt-2 text-[13px] text-muted">Last updated: July 2026</p>
+
+      <h2>What we collect</h2>
+      <p>
+        To give you an estimate, we use the address you type in. You do not
+        need to give us your name, phone number, or email just to see a price.
+      </p>
+
+      <h2>If you book an inspection</h2>
+      <p>
+        If you choose to book a free inspection, we ask for contact details so
+        a local roofer can arrange the visit. We share those details with that
+        roofer and no one else.
+      </p>
+
+      <h2>What we do not do</h2>
+      <p>
+        We do not sell your information. We do not send marketing you did not
+        ask for. We do not pass your details to call centres.
+      </p>
+
+      <h2>Analytics</h2>
+      <p>
+        We use basic, privacy-respecting analytics to understand how the site
+        performs, such as page speed measurements. These do not identify you
+        personally.
+      </p>
+
+      <h2>Your choices</h2>
+      <p>
+        If you want anything you have given us removed, email us and we will
+        delete it: <a href="mailto:hello@quoter.app" class="text-brand-600 hover:underline">hello@quoter.app</a>
+      </p>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .legal-panel {
+    background: rgba(255, 255, 255, 0.86);
+    backdrop-filter: blur(20px) saturate(1.3);
+    -webkit-backdrop-filter: blur(20px) saturate(1.3);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: var(--shadow-float);
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-size: 19px;
+    color: var(--color-ink);
+    margin-top: 1.9rem;
+  }
+  p {
+    margin-top: 0.6rem;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--color-ink-soft);
+  }
+</style>
