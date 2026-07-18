@@ -1,0 +1,688 @@
+---
+// Satellite section — zoom in, then the original scan + outline.
+//
+// To set the roof outline:
+// 1. npm run dev → open http://localhost:4321/trace-roof.html
+// 2. Click clockwise around the outer eaves (~20–40 points)
+// 3. Close shape → Copy path → paste into roofPath below
+const roofPath =
+  "M277 356 L277 408 L277 480 L277 508 L308 512 L335 517 L339 533 L339 544 L411 545 L474 545 L534 545 L571 547 L625 548 L677 548 L724 551 L725 534 L774 526 L789 513 L807 490 L808 450 L794 428 L784 423 L784 387 L783 341 L777 318 L778 287 L778 255 L725 245 L669 241 L616 239 L611 201 L600 200 L601 141 L546 138 L494 140 L482 140 L479 197 L469 207 L467 239 L362 239 L357 324 L341 334 L342 354 L314 357 Z";
+---
+
+<section id="tech" class="relative mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-14" data-sat data-reveal="fade">
+  <div class="sat-panel relative">
+  <div class="sat-panel-bg" aria-hidden="true">
+    <canvas class="sat-clouds" data-clouds></canvas>
+  </div>
+  <div class="sat-panel-blur" aria-hidden="true"></div>
+  <div class="relative z-10 px-5 py-8 sm:px-8 sm:py-10 lg:px-10">
+  <div class="sat-layout">
+    <div class="sat-copy" data-reveal="left">
+      <span class="section-label sat-label">From above</span>
+      <h2 class="font-display mt-3 text-[clamp(1.7rem,3.5vw,2.35rem)] leading-[1.06] text-white">
+        We measure your roof from space.
+      </h2>
+      <p class="mt-3 max-w-sm text-[15.5px] leading-relaxed text-white/90">
+        Satellite imagery maps the size, shape and pitch — in seconds.
+      </p>
+    </div>
+
+    <div class="sat-wrap" aria-hidden="true" data-reveal="right" data-delay="1">
+      <div class="sat-card">
+        <!-- Photo + overlay share one transform so the path stays locked -->
+        <div class="sat-stage">
+          <img
+            class="sat-photo"
+            src="/satellite-roof.jpg"
+            alt=""
+            width="1024"
+            height="768"
+            loading="lazy"
+            decoding="async"
+          />
+
+          <svg class="sat-overlay" viewBox="0 0 1024 768" preserveAspectRatio="xMidYMid slice">
+            <defs>
+              <linearGradient id="sat-scan-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="rgba(79,139,255,0)" />
+                <stop offset="0.45" stop-color="rgba(120,175,255,0.75)" />
+                <stop offset="1" stop-color="rgba(79,139,255,0)" />
+              </linearGradient>
+              <filter id="sat-glow-soft" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="12" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                </feMerge>
+              </filter>
+              <filter id="sat-glow-core" x="-35%" y="-35%" width="170%" height="170%">
+                <feGaussianBlur stdDeviation="3.5" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+
+            {roofPath && (
+              <g class="sat-roof">
+                <path class="sat-roof-fill" d={roofPath} />
+                <path class="sat-roof-glow" d={roofPath} filter="url(#sat-glow-soft)" />
+                <path class="sat-roof-line" d={roofPath} filter="url(#sat-glow-core)" />
+              </g>
+            )}
+
+            <rect class="sat-scan" x="0" y="0" width="1024" height="110" fill="url(#sat-scan-grad)" />
+          </svg>
+        </div>
+
+        <div class="sat-vignette"></div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+</section>
+
+<style>
+  /* Compact cloudscape panel: a rounded panel of live WebGL clouds floating
+     on the white page. The gradient below is the fallback shown until the
+     shader's first frame (and if WebGL is unavailable). */
+  /* Blended cloudscape feature — not a card. The sky layer bleeds well
+     beyond the content on every side and fades out through a two-axis soft
+     mask, so the clouds materialize out of the page. The top bleed reaches
+     up into the hero blob's fade-out tail, so blob and clouds hand off into
+     each other with no boundary. Only the background is masked; the content
+     on top stays crisp. */
+  .sat-panel-bg {
+    position: absolute;
+    top: -240px;
+    bottom: -100px;
+    left: -110px;
+    right: -110px;
+    /* Deep brand blue — reads like the vivid core of the hero blob */
+    background: linear-gradient(180deg, #1f57f0 0%, #4f8bff 50%, #ffffff 100%);
+    /* Oval + soft H/V fades — rectangle silhouette with gently rounded corners */
+    -webkit-mask-image:
+      radial-gradient(
+        ellipse 74% 61% at 50% 50%,
+        #000 46%,
+        rgba(0, 0, 0, 0.92) 62%,
+        rgba(0, 0, 0, 0.55) 78%,
+        rgba(0, 0, 0, 0.18) 91%,
+        transparent 100%
+      ),
+      linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(0, 0, 0, 0.35) 7%,
+        #000 16%,
+        #000 84%,
+        rgba(0, 0, 0, 0.35) 93%,
+        transparent 100%
+      ),
+      linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(0, 0, 0, 0.35) 8%,
+        #000 17%,
+        #000 83%,
+        rgba(0, 0, 0, 0.35) 92%,
+        transparent 100%
+      );
+    -webkit-mask-composite: source-in;
+    mask-image:
+      radial-gradient(
+        ellipse 74% 61% at 50% 50%,
+        #000 46%,
+        rgba(0, 0, 0, 0.92) 62%,
+        rgba(0, 0, 0, 0.55) 78%,
+        rgba(0, 0, 0, 0.18) 91%,
+        transparent 100%
+      ),
+      linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(0, 0, 0, 0.35) 7%,
+        #000 16%,
+        #000 84%,
+        rgba(0, 0, 0, 0.35) 93%,
+        transparent 100%
+      ),
+      linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(0, 0, 0, 0.35) 8%,
+        #000 17%,
+        #000 83%,
+        rgba(0, 0, 0, 0.35) 92%,
+        transparent 100%
+      );
+    mask-composite: intersect;
+    pointer-events: none;
+  }
+  @media (max-width: 640px) {
+    .sat-panel-bg {
+      left: -24px;
+      right: -24px;
+    }
+  }
+
+  /* Border-only blur: an overlay ring that blurs whatever is behind it
+     (sky edge + page white) — hollow in the middle so the cloud detail
+     stays crisp, ramping up toward the silhouette's fringes. */
+  .sat-panel-blur {
+    position: absolute;
+    top: -260px;
+    bottom: -120px;
+    left: -130px;
+    right: -130px;
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    /* Same soft-rect silhouette as the sky, hollowed into an edge ring */
+    -webkit-mask-image:
+      radial-gradient(
+        ellipse 72% 58% at 50% 50%,
+        transparent 52%,
+        rgba(0, 0, 0, 0.55) 68%,
+        #000 80%,
+        rgba(0, 0, 0, 0.4) 91%,
+        transparent 100%
+      ),
+      linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(0, 0, 0, 0.35) 7%,
+        #000 16%,
+        #000 84%,
+        rgba(0, 0, 0, 0.35) 93%,
+        transparent 100%
+      ),
+      linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(0, 0, 0, 0.35) 8%,
+        #000 17%,
+        #000 83%,
+        rgba(0, 0, 0, 0.35) 92%,
+        transparent 100%
+      );
+    -webkit-mask-composite: source-in;
+    mask-image:
+      radial-gradient(
+        ellipse 72% 58% at 50% 50%,
+        transparent 52%,
+        rgba(0, 0, 0, 0.55) 68%,
+        #000 80%,
+        rgba(0, 0, 0, 0.4) 91%,
+        transparent 100%
+      ),
+      linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(0, 0, 0, 0.35) 7%,
+        #000 16%,
+        #000 84%,
+        rgba(0, 0, 0, 0.35) 93%,
+        transparent 100%
+      ),
+      linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(0, 0, 0, 0.35) 8%,
+        #000 17%,
+        #000 83%,
+        rgba(0, 0, 0, 0.35) 92%,
+        transparent 100%
+      );
+    mask-composite: intersect;
+    pointer-events: none;
+  }
+  @media (max-width: 640px) {
+    .sat-panel-blur {
+      left: -40px;
+      right: -40px;
+    }
+  }
+  .sat-clouds {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    pointer-events: none;
+  }
+  /* Soft depth behind the copy for white type */
+  .sat-panel-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 42% 48% at 27% 52%,
+      rgba(15, 55, 160, 0.38),
+      rgba(31, 87, 240, 0.14) 55%,
+      transparent 80%
+    );
+    pointer-events: none;
+  }
+
+  .sat-copy h2,
+  .sat-copy p {
+    text-shadow: 0 1px 14px rgba(10, 30, 90, 0.4);
+  }
+  .sat-label {
+    color: #eef4ff;
+  }
+  .sat-label::before {
+    background: #fff;
+  }
+
+  .sat-layout {
+    display: grid;
+    align-items: center;
+    gap: 1.75rem;
+  }
+  @media (min-width: 1024px) {
+    .sat-layout {
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.1fr);
+      gap: 2.5rem;
+    }
+  }
+
+  .sat-copy {
+    text-align: center;
+    max-width: 22rem;
+    margin-inline: auto;
+  }
+  @media (min-width: 1024px) {
+    .sat-copy {
+      text-align: left;
+      margin-inline: 0;
+      max-width: none;
+    }
+  }
+
+  .sat-wrap {
+    width: 100%;
+    max-width: 480px;
+    margin-inline: auto;
+  }
+  @media (min-width: 1024px) {
+    .sat-wrap {
+      max-width: 520px;
+      margin-inline: 0 0 0 auto;
+    }
+  }
+
+  .sat-card {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    box-shadow:
+      0 0 0 1px rgba(21, 55, 140, 0.18),
+      0 24px 48px -18px rgba(15, 40, 100, 0.5);
+    aspect-ratio: 4 / 3;
+    background: #1a1e16;
+  }
+
+  .sat-stage {
+    position: absolute;
+    inset: 0;
+    transform: scale(1);
+    transform-origin: center center;
+  }
+
+  .sat-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+  }
+
+  .sat-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 58% 52% at 50% 50%,
+      transparent 35%,
+      rgba(8, 12, 24, 0.4) 100%
+    );
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .sat-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .sat-roof-fill {
+    fill: rgba(47, 107, 255, 0.28);
+    opacity: 0;
+  }
+  .sat-roof-glow,
+  .sat-roof-line {
+    fill: none;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    stroke-dasharray: var(--sat-len, 2400);
+    stroke-dashoffset: var(--sat-len, 2400);
+  }
+  .sat-roof-glow {
+    stroke: rgba(120, 175, 255, 1);
+    stroke-width: 14;
+  }
+  .sat-roof-line {
+    stroke: #e8f1ff;
+    stroke-width: 3;
+  }
+
+  .sat-scan {
+    opacity: 0;
+    mix-blend-mode: screen;
+  }
+
+  /* 1) Zoom first */
+  .sat-card.playing .sat-stage {
+    animation: sat-zoom 2.2s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  }
+
+  /* 2) Exact previous scan + outline, after the zoom */
+  .sat-card.playing .sat-scan {
+    animation: sat-scan 2.6s ease-in-out infinite 2.5s;
+  }
+  .sat-card.playing .sat-roof-glow,
+  .sat-card.playing .sat-roof-line {
+    animation: sat-draw 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 2.5s;
+  }
+  .sat-card.playing .sat-roof-glow {
+    animation-name: sat-draw, sat-glow-pulse;
+    animation-duration: 1.5s, 2.8s;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1), ease-in-out;
+    animation-delay: 2.5s, 4s;
+    animation-fill-mode: forwards, none;
+    animation-iteration-count: 1, infinite;
+  }
+  .sat-card.playing .sat-roof-fill {
+    animation: sat-fill-in 1s ease forwards 3.5s;
+  }
+
+  @keyframes sat-zoom {
+    from { transform: scale(1); }
+    to { transform: scale(1.28); }
+  }
+  @keyframes sat-draw { to { stroke-dashoffset: 0; } }
+  @keyframes sat-fill-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes sat-glow-pulse {
+    0%, 100% { opacity: 0.85; }
+    50% { opacity: 1; }
+  }
+  @keyframes sat-scan {
+    0% { transform: translateY(-110px); opacity: 0; }
+    15% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { transform: translateY(768px); opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sat-stage { transform: scale(1.28); }
+    .sat-card.playing .sat-stage { animation: none; }
+    .sat-card.playing .sat-roof-fill,
+    .sat-card.playing .sat-roof-glow {
+      animation: none;
+      opacity: 1;
+    }
+    .sat-card.playing .sat-roof-line,
+    .sat-card.playing .sat-roof-glow {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+    .sat-card.playing .sat-scan {
+      animation: none;
+      opacity: 0;
+    }
+  }
+</style>
+
+<script>
+  function initSat() {
+    const root = document.querySelector("[data-sat]");
+    if (!root) return;
+    const card = root.querySelector(".sat-card");
+    if (!card || card.classList.contains("playing")) return;
+    const paths = card.querySelectorAll(".sat-roof-line, .sat-roof-glow");
+    paths.forEach((el) => {
+      const path = el as SVGPathElement;
+      const len = Math.ceil(path.getTotalLength()) + 2;
+      path.style.setProperty("--sat-len", String(len));
+    });
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            card.classList.add("playing");
+            io.disconnect();
+          }
+        });
+      },
+      { threshold: 0.45 }
+    );
+    io.observe(card);
+  }
+  initSat();
+  document.addEventListener("astro:after-swap", initSat);
+</script>
+
+<script>
+  // Cloudscape — WebGL fbm cloud shader (ported from a React component to
+  // vanilla JS for Astro). Renders soft drifting clouds into [data-clouds].
+  const CLOUD_VERT = `
+attribute vec2 position;
+void main() {
+  gl_Position = vec4(position, 0.0, 1.0);
+}
+`;
+
+  const CLOUD_FRAG = `
+precision highp float;
+
+uniform vec2 u_resolution;
+uniform float u_time;
+uniform vec3 u_colorBottom;
+uniform vec3 u_colorMid;
+uniform vec3 u_colorTop;
+uniform float u_speed;
+
+float hash(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+}
+
+float noise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  float a = hash(i);
+  float b = hash(i + vec2(1.0, 0.0));
+  float c = hash(i + vec2(0.0, 1.0));
+  float d = hash(i + vec2(1.0, 1.0));
+  vec2 u = f * f * (3.0 - 2.0 * f);
+  return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+}
+
+float fbm(vec2 p, float t) {
+  float v = 0.0;
+  float a = 0.5;
+  float fi = 0.0;
+  mat2 rot = mat2(0.86, 0.51, -0.51, 0.86);
+
+  for (int i = 0; i < 5; i++) {
+    vec2 morph = vec2(sin(t * 0.5 + fi), cos(t * 0.3 - fi)) * 0.05;
+    v += a * noise(p + morph);
+    p = rot * p * 2.0;
+    a *= 0.5;
+    fi += 1.0;
+  }
+  return v;
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_resolution;
+  float t = u_time * u_speed;
+  vec2 aspect = vec2(u_resolution.x / max(u_resolution.y, 1.0), 1.0);
+  vec2 p = (uv - 0.5) * aspect;
+
+  vec2 wind = vec2(t * 0.1, t * 0.02);
+
+  float pattern = fbm(p * 2.2 - wind, t);
+  /* Larger, slower layer — soft billows under the detail */
+  float billow = fbm(p * 0.95 - wind * 0.45 + 3.1, t * 0.65);
+
+  float bandLow = smoothstep(0.28, 0.6, pattern);
+  float bandHigh = smoothstep(0.52, 0.82, pattern);
+  float softHigh = smoothstep(0.42, 0.78, mix(pattern, billow, 0.45));
+
+  vec3 color = mix(u_colorBottom, u_colorMid, bandLow);
+  color = mix(color, u_colorTop, max(bandHigh, softHigh * 0.55));
+
+  /* Atmosphere: deeper zenith, brighter near the horizon */
+  float skyGrad = smoothstep(0.0, 1.0, uv.y);
+  color = mix(color * 0.88, color * 1.08, skyGrad);
+
+  /* Soft sun bloom — upper-right, keeps the sky from reading flat */
+  float sun = exp(-length((uv - vec2(0.78, 0.82)) * vec2(1.35, 1.1)) * 3.2);
+  color += vec3(0.22, 0.28, 0.38) * sun;
+
+  gl_FragColor = vec4(color, 1.0);
+}
+`;
+
+  // Brand-tinted sky: deep blue base, mid blue, white cloud tops.
+  // Darker base = stronger contrast against the pale page around the panel.
+  // Deep brand base, bright mid, pure white cloud tops
+  const CLOUD_COLORS: [number, number, number][] = [
+    hexToRgb("#1f57f0"),
+    hexToRgb("#7aa8ff"),
+    hexToRgb("#ffffff"),
+  ];
+  const CLOUD_SPEED = 0.8;
+  // Clouds are soft gradients — rendering at half resolution is visually
+  // identical but does 4x less fragment work.
+  const CLOUD_RES_SCALE = 0.5;
+  // Slow-moving clouds don't need 60fps; 30 halves GPU time again.
+  const CLOUD_FRAME_MS = 1000 / 30;
+
+  function hexToRgb(hex: string): [number, number, number] {
+    const h = hex.replace("#", "");
+    return [
+      parseInt(h.slice(0, 2), 16) / 255,
+      parseInt(h.slice(2, 4), 16) / 255,
+      parseInt(h.slice(4, 6), 16) / 255,
+    ];
+  }
+
+  function initClouds() {
+    document.querySelectorAll<HTMLCanvasElement>("canvas[data-clouds]").forEach((canvas) => {
+      if (canvas.dataset.ready) return;
+      const host = canvas.parentElement;
+      if (!host) return;
+      const gl = canvas.getContext("webgl", { antialias: true, alpha: true });
+      if (!gl) return; // CSS gradient fallback stays visible
+      canvas.dataset.ready = "1";
+
+      const compile = (type: number, src: string) => {
+        const shader = gl.createShader(type);
+        if (!shader) return null;
+        gl.shaderSource(shader, src);
+        gl.compileShader(shader);
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+          console.error("Shader compile error:", gl.getShaderInfoLog(shader));
+          gl.deleteShader(shader);
+          return null;
+        }
+        return shader;
+      };
+
+      const vert = compile(gl.VERTEX_SHADER, CLOUD_VERT);
+      const frag = compile(gl.FRAGMENT_SHADER, CLOUD_FRAG);
+      if (!vert || !frag) return;
+
+      const program = gl.createProgram();
+      if (!program) return;
+      gl.attachShader(program, vert);
+      gl.attachShader(program, frag);
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        console.error("Program link error:", gl.getProgramInfoLog(program));
+        return;
+      }
+      gl.useProgram(program);
+
+      const posLoc = gl.getAttribLocation(program, "position");
+      const buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+      gl.enableVertexAttribArray(posLoc);
+      gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+      const uRes = gl.getUniformLocation(program, "u_resolution");
+      const uTime = gl.getUniformLocation(program, "u_time");
+
+      // Colors and speed never change — set them once.
+      gl.uniform3f(gl.getUniformLocation(program, "u_colorBottom"), ...CLOUD_COLORS[0]);
+      gl.uniform3f(gl.getUniformLocation(program, "u_colorMid"), ...CLOUD_COLORS[1]);
+      gl.uniform3f(gl.getUniformLocation(program, "u_colorTop"), ...CLOUD_COLORS[2]);
+      gl.uniform1f(gl.getUniformLocation(program, "u_speed"), CLOUD_SPEED);
+
+      const resize = () => {
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.5) * CLOUD_RES_SCALE;
+        const rect = host.getBoundingClientRect();
+        canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+        canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.uniform2f(uRes, canvas.width, canvas.height);
+      };
+      resize();
+      new ResizeObserver(resize).observe(host);
+
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const start = performance.now();
+      let visible = true;
+
+      const draw = (now: number) => {
+        gl.uniform1f(uTime, (now - start) / 1000);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      };
+
+      if (reducedMotion) {
+        // Single static frame — still clouds, no motion
+        draw(start + 20000);
+        return;
+      }
+
+      let lastFrame = 0;
+      const loop = (now: number) => {
+        if (visible && now - lastFrame >= CLOUD_FRAME_MS) {
+          lastFrame = now;
+          draw(now);
+        }
+        requestAnimationFrame(loop);
+      };
+      requestAnimationFrame(loop);
+
+      // Don't burn GPU while the panel is offscreen
+      new IntersectionObserver((entries) => {
+        entries.forEach((e) => (visible = e.isIntersecting));
+      }).observe(host);
+    });
+  }
+  initClouds();
+  document.addEventListener("astro:after-swap", initClouds);
+</script>

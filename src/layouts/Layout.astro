@@ -1,0 +1,79 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Quoter: Instant roof quotes for your website",
+  description = "Quoter adds an instant, branded quote widget to any roofing website. Homeowners get a ballpark price from their address in seconds, so you get qualified leads without driving out for every guess.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#ffffff" />
+  </head>
+  <body>
+    <div class="site-bg" aria-hidden="true"></div>
+    <div class="site-dots" aria-hidden="true"></div>
+    <slot />
+
+    {/*
+      Real Quoter widget embed goes here when it's ready, e.g.:
+      <script src="https://cdn.quoter.app/embed.js" data-quoter="YOUR_SITE_KEY" defer></script>
+      It replaces the placeholder demo in DemoSection.astro (#quoter-widget).
+    */}
+  </body>
+</html>
+
+<script>
+  // Scroll-triggered reveals — transform/opacity only, one observer for the page.
+  function initReveals() {
+    const nodes = document.querySelectorAll<HTMLElement>("[data-reveal], [data-stagger]");
+    if (!nodes.length) return;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      nodes.forEach((el) => el.classList.add("is-in"));
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-in");
+          io.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.18, rootMargin: "0px 0px -8% 0px" }
+    );
+
+    nodes.forEach((el) => {
+      // Already visible on first paint (e.g. tall screens) — reveal immediately
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.9 && rect.bottom > 0) {
+        // Stagger a frame so CSS transitions still fire
+        requestAnimationFrame(() => el.classList.add("is-in"));
+      } else {
+        io.observe(el);
+      }
+    });
+  }
+
+  initReveals();
+  document.addEventListener("astro:after-swap", initReveals);
+</script>

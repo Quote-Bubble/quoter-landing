@@ -1,0 +1,43 @@
+---
+import Logo from "./Logo.astro";
+const year = new Date().getFullYear();
+---
+
+<section class="relative mx-auto max-w-3xl px-6 pt-8 pb-24 text-center sm:pb-28" data-reveal="scale">
+  <h2 class="font-display text-[clamp(1.9rem,4vw,2.8rem)] leading-[1.06] text-ink">
+    Ready to see your number?
+  </h2>
+  <p class="mx-auto mt-4 max-w-md text-[16px] leading-relaxed text-ink-soft">
+    A free, instant ballpark for your roof. No ladders, no sales visit, no
+    obligation — just your address.
+  </p>
+  <button
+    type="button"
+    data-try
+    class="btn-primary mt-8 inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-[15px] font-semibold"
+  >
+    Get my instant quote
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+</section>
+
+<footer class="relative border-t border-line" data-reveal data-delay="1">
+  <div class="mx-auto max-w-6xl px-6 py-8">
+    <div class="flex flex-col items-center justify-between gap-5 sm:flex-row">
+      <a href="/" class="flex items-center gap-2.5" aria-label="Quoter home">
+        <Logo size={26} />
+        <span class="text-[16px] font-semibold text-ink">Quoter</span>
+      </a>
+      <nav class="flex items-center gap-7 text-[14px] text-ink-soft">
+        <a href="#how" class="transition-colors hover:text-ink">How it works</a>
+        <a href="mailto:hello@quoter.app" class="transition-colors hover:text-ink">Contact</a>
+      </nav>
+      <p class="text-[13px] text-muted">© {year} Quoter</p>
+    </div>
+    <p class="mt-6 text-center text-[12px] text-muted sm:text-left">
+      Prices shown are ballpark figures. A qualified local roofer confirms every quote.
+    </p>
+  </div>
+</footer>

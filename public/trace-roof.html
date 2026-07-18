@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Trace roof outline</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        background: #0f1115;
+        color: #e8eaef;
+        padding: 20px;
+      }
+      h1 { font-size: 16px; font-weight: 600; margin: 0 0 8px; }
+      p { margin: 0 0 16px; color: #9aa3b2; font-size: 13px; max-width: 520px; line-height: 1.45; }
+      .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+      .stage {
+        position: relative;
+        width: min(840px, 100%);
+        user-select: none;
+        touch-action: none;
+      }
+      .stage img, .stage svg {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .stage svg {
+        position: absolute;
+        inset: 0;
+        cursor: crosshair;
+      }
+      .panel {
+        background: #1a1f29;
+        border: 1px solid #2a3140;
+        border-radius: 12px;
+        padding: 14px;
+        width: min(360px, 100%);
+      }
+      .btns { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+      button {
+        background: #2f6bff;
+        color: #fff;
+        border: 0;
+        border-radius: 8px;
+        padding: 8px 12px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      button.secondary { background: #2a3140; }
+      button:disabled { opacity: 0.45; cursor: not-allowed; }
+      textarea {
+        width: 100%;
+        min-height: 160px;
+        background: #0f1115;
+        color: #d7e0ff;
+        border: 1px solid #2a3140;
+        border-radius: 8px;
+        padding: 10px;
+        font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+        resize: vertical;
+      }
+      .hint { font-size: 12px; color: #8b95a8; margin-top: 8px; }
+      .count { font-size: 12px; color: #5ee09a; margin-bottom: 8px; }
+    </style>
+  </head>
+  <body>
+    <h1>Trace the roof outline</h1>
+    <p>
+      Click around the outer edge of the roof, clockwise. Double-click or press
+      <b>Enter</b> to close the shape. Then copy the path into
+      <code>Satellite.astro</code>.
+    </p>
+
+    <div class="row">
+      <div class="stage" id="stage">
+        <img src="/satellite-roof.jpg" width="1024" height="768" alt="Roof aerial" draggable="false" />
+        <svg id="svg" viewBox="0 0 1024 768" preserveAspectRatio="none">
+          <polygon id="fill" points="" fill="rgba(47,107,255,0.22)" stroke="none" />
+          <polyline id="line" points="" fill="none" stroke="#6ea0ff" stroke-width="2" stroke-linejoin="round" />
+          <g id="dots"></g>
+        </svg>
+      </div>
+
+      <div class="panel">
+        <div class="count"><span id="n">0</span> points</div>
+        <div class="btns">
+          <button type="button" id="undo" class="secondary">Undo</button>
+          <button type="button" id="clear" class="secondary">Clear</button>
+          <button type="button" id="close">Close shape</button>
+          <button type="button" id="copy">Copy path</button>
+        </div>
+        <textarea id="out" readonly placeholder="Path appears here…"></textarea>
+        <p class="hint">Tip: zoom the browser if you need precision. Aim for ~20–40 points along the eaves.</p>
+      </div>
+    </div>
+
+    <script>
+      const W = 1024, H = 768;
+      const svg = document.getElementById("svg");
+      const line = document.getElementById("line");
+      const fill = document.getElementById("fill");
+      const dots = document.getElementById("dots");
+      const out = document.getElementById("out");
+      const nEl = document.getElementById("n");
+      const pts = [];
+      let closed = false;
+
+      function toLocal(evt) {
+        const rect = svg.getBoundingClientRect();
+        const x = ((evt.clientX - rect.left) / rect.width) * W;
+        const y = ((evt.clientY - rect.top) / rect.height) * H;
+        return [Math.round(x), Math.round(y)];
+      }
+
+      function render() {
+        const s = pts.map((p) => p.join(",")).join(" ");
+        line.setAttribute("points", s);
+        fill.setAttribute("points", closed && pts.length > 2 ? s : "");
+        dots.innerHTML = pts
+          .map(
+            ([x, y], i) =>
+              `<circle cx="${x}" cy="${y}" r="3.5" fill="#fff" stroke="#2f6bff" stroke-width="1.5" data-i="${i}" />`
+          )
+          .join("");
+        nEl.textContent = String(pts.length);
+
+        if (pts.length) {
+          const body = pts.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x} ${y}`).join(" ");
+          out.value = closed ? `${body} Z` : body;
+        } else {
+          out.value = "";
+        }
+      }
+
+      svg.addEventListener("click", (e) => {
+        if (closed) return;
+        pts.push(toLocal(e));
+        render();
+      });
+
+      svg.addEventListener("dblclick", (e) => {
+        e.preventDefault();
+        if (pts.length > 2) {
+          closed = true;
+          render();
+        }
+      });
+
+      document.getElementById("undo").onclick = () => {
+        pts.pop();
+        closed = false;
+        render();
+      };
+      document.getElementById("clear").onclick = () => {
+        pts.length = 0;
+        closed = false;
+        render();
+      };
+      document.getElementById("close").onclick = () => {
+        if (pts.length > 2) {
+          closed = true;
+          render();
+        }
+      };
+      document.getElementById("copy").onclick = async () => {
+        if (!out.value) return;
+        await navigator.clipboard.writeText(out.value);
+        document.getElementById("copy").textContent = "Copied!";
+        setTimeout(() => (document.getElementById("copy").textContent = "Copy path"), 1200);
+      };
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && pts.length > 2) {
+          closed = true;
+          render();
+        }
+        if (e.key === "Backspace") {
+          e.preventDefault();
+          pts.pop();
+          closed = false;
+          render();
+        }
+      });
+    </script>
+  </body>
+</html>

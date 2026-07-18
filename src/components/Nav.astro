@@ -1,0 +1,24 @@
+---
+import Logo from "./Logo.astro";
+---
+
+<header class="absolute inset-x-0 top-0 z-50 nav-load">
+  <nav class="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+    <a href="/" class="flex items-center gap-2.5" aria-label="Quoter home">
+      <Logo size={30} />
+      <span class="text-[19px] font-semibold tracking-tight text-ink">Quoter</span>
+    </a>
+
+    <div class="hidden items-center gap-8 md:flex">
+      <a href="#how" class="text-sm font-medium text-ink-soft transition-colors hover:text-ink">How it works</a>
+    </div>
+
+    <button
+      type="button"
+      data-try
+      class="btn-primary inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold"
+    >
+      Get my quote
+    </button>
+  </nav>
+</header>

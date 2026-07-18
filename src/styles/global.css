@@ -1,0 +1,408 @@
+@import "tailwindcss";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/fraunces";
+@import "@fontsource/poppins/300.css";
+@import "@fontsource/poppins/400.css";
+
+/* ---------------------------------------------------------------
+   Quoter design tokens — Billow-inspired: light, editorial, blue.
+---------------------------------------------------------------- */
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-serif: "Fraunces Variable", ui-serif, Georgia, "Times New Roman", serif;
+  --font-display: "Poppins", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+
+  /* Neutrals */
+  --color-canvas: #ffffff;
+  --color-ink: #0a0b0d;
+  --color-ink-soft: #3d4148;
+  --color-muted: #6b7280;
+  --color-line: #e9eaee;
+
+  /* Brand blue (electric, Billow-like) */
+  --color-brand-50: #eef4ff;
+  --color-brand-100: #dae6ff;
+  --color-brand-300: #7aa8ff;
+  --color-brand-400: #4f8bff;
+  --color-brand-500: #2f6bff;
+  --color-brand-600: #1f57f0;
+  --color-brand-700: #1546c9;
+
+  --shadow-soft: 0 1px 2px rgba(10, 11, 13, 0.04), 0 8px 24px rgba(10, 11, 13, 0.06);
+  --shadow-float: 0 24px 60px -20px rgba(23, 60, 160, 0.28), 0 8px 24px rgba(10, 11, 13, 0.08);
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  /* Blend the classic scrollbar into the page instead of a stark white track */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(47, 107, 255, 0.35) transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(47, 107, 255, 0.35);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(47, 107, 255, 0.55);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+body {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+/* Gradient wallpaper — absolute (not fixed) so it's inked onto the page and
+   scrolls with it. The band geometry is constant: nothing here is anchored to
+   content, so the widget opening/closing can never resize or move the blob.
+   The mask wraps the blob tightly around the bottom of the search widget. */
+.site-bg {
+  position: absolute;
+  top: -90px;
+  left: -90px;
+  right: -90px;
+  height: 1600px;
+  z-index: -2;
+  background-image: url("/bg-v3.webp");
+  background-repeat: no-repeat;
+  background-position: center 300px;
+  background-size: cover;
+  filter: blur(30px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 50%, transparent 84%);
+  mask-image: linear-gradient(to bottom, #000 50%, transparent 84%);
+  pointer-events: none;
+}
+
+/* Really faint dot-matrix for a touch of texture/depth */
+.site-dots {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(rgba(12, 20, 55, 0.035) 1px, transparent 1.4px);
+  background-size: 22px 22px;
+  background-position: center top;
+  pointer-events: none;
+}
+
+/* Selection */
+::selection {
+  background: var(--color-brand-500);
+  color: #fff;
+}
+
+/* ---------------------------------------------------------------
+   Utility helpers
+---------------------------------------------------------------- */
+.font-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+
+/* Primary blue gradient pill button */
+.btn-primary {
+  background: linear-gradient(180deg, var(--color-brand-500) 0%, var(--color-brand-600) 100%);
+  color: #fff;
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.28) inset,
+    0 8px 20px -6px rgba(31, 87, 240, 0.5);
+  transition:
+    transform 0.35s var(--ease-out-expo),
+    box-shadow 0.35s var(--ease-out-expo),
+    filter 0.25s ease;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.04);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.32) inset,
+    0 14px 30px -6px rgba(31, 87, 240, 0.58);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Secondary white pill button */
+.btn-ghost {
+  background: #fff;
+  color: var(--color-ink);
+  border: 1px solid var(--color-line);
+  box-shadow: var(--shadow-soft);
+  transition:
+    transform 0.35s var(--ease-out-expo),
+    box-shadow 0.35s var(--ease-out-expo),
+    border-color 0.25s ease;
+}
+.btn-ghost:hover {
+  transform: translateY(-2px);
+  border-color: #d7d9e0;
+  box-shadow: 0 2px 4px rgba(10, 11, 13, 0.05), 0 14px 32px rgba(10, 11, 13, 0.1);
+}
+
+/* Pill eyebrow badge */
+.eyebrow {
+  background: #fff;
+  border: 1px solid var(--color-line);
+  box-shadow: var(--shadow-soft);
+}
+
+/* Lower sections sit directly on the page — the blob has already faded out
+   by here via its own mask, so no white overlay (and no seam) is needed. */
+.page-lower {
+  position: relative;
+}
+
+/* Frosted-glass card so the gradient shows through */
+.glass {
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(18px) saturate(1.35);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 1px 2px rgba(10, 11, 13, 0.03),
+    0 18px 40px -24px rgba(23, 60, 160, 0.28);
+}
+.glass-hover {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+}
+.glass-hover:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 2px 4px rgba(10, 11, 13, 0.04),
+    0 28px 56px -22px rgba(23, 60, 160, 0.4);
+}
+
+/* Small uppercase section label */
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-brand-600);
+}
+.section-label::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-brand-500);
+}
+
+/* ---------------------------------------------------------------
+   Motion system — page load + scroll reveals
+   Transform/opacity only. Scroll reveals need .is-in from JS.
+---------------------------------------------------------------- */
+:root {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* —— Page-load primitives —— */
+@keyframes load-fade-up {
+  from { opacity: 0; transform: translate3d(0, 28px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes load-fade-down {
+  from { opacity: 0; transform: translate3d(0, -18px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes load-rise {
+  from { opacity: 0; transform: translate3d(0, 48px, 0) scale(0.96); filter: blur(8px); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0); }
+}
+@keyframes load-line {
+  from { opacity: 0; transform: translate3d(0, 110%, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes load-blob {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes load-dots {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-in {
+  opacity: 0;
+  animation: load-fade-up 0.95s var(--ease-out-expo) forwards;
+}
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.22s; }
+.delay-3 { animation-delay: 0.36s; }
+.delay-4 { animation-delay: 0.5s; }
+.delay-5 { animation-delay: 0.66s; }
+
+/* Nav drops in first */
+.nav-load {
+  opacity: 0;
+  animation: load-fade-down 0.8s var(--ease-out-expo) 0.05s forwards;
+}
+
+/* Hero headline: clip-reveal each line */
+.hero-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.06em;
+  margin-bottom: -0.06em;
+}
+.hero-line-inner {
+  display: block;
+  opacity: 0;
+  animation: load-line 1.05s var(--ease-out-expo) forwards;
+}
+.hero-line:nth-child(1) .hero-line-inner { animation-delay: 0.18s; }
+.hero-line:nth-child(2) .hero-line-inner { animation-delay: 0.32s; }
+
+/* Widget rises into place with a soft blur clear */
+.widget-load {
+  opacity: 0;
+  animation: load-rise 1.15s var(--ease-out-expo) 0.55s forwards;
+}
+
+/* Atmosphere enters with the page */
+.site-bg {
+  opacity: 0;
+  transform-origin: center 40%;
+  animation: load-blob 1.4s var(--ease-out-soft) 0.12s forwards;
+}
+.site-dots {
+  opacity: 0;
+  animation: load-dots 1.2s ease 0.3s forwards;
+}
+
+/* —— Scroll reveals —— */
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 36px, 0);
+  transition:
+    opacity 1s var(--ease-out-expo),
+    transform 1s var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+[data-reveal="left"]  { transform: translate3d(-40px, 18px, 0); }
+[data-reveal="right"] { transform: translate3d(40px, 18px, 0); }
+[data-reveal="scale"] {
+  transform: translate3d(0, 28px, 0) scale(0.94);
+}
+[data-reveal="fade"] {
+  transform: none;
+}
+[data-reveal].is-in {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* Stagger children inside a revealed group */
+[data-stagger] > * {
+  opacity: 0;
+  transform: translate3d(0, 32px, 0);
+  transition:
+    opacity 0.9s var(--ease-out-expo),
+    transform 0.9s var(--ease-out-expo);
+}
+[data-stagger].is-in > *:nth-child(1) { transition-delay: 0.05s; }
+[data-stagger].is-in > *:nth-child(2) { transition-delay: 0.16s; }
+[data-stagger].is-in > *:nth-child(3) { transition-delay: 0.27s; }
+[data-stagger].is-in > *:nth-child(4) { transition-delay: 0.38s; }
+[data-stagger].is-in > *:nth-child(5) { transition-delay: 0.49s; }
+[data-stagger].is-in > * {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Delay helpers for data-reveal */
+[data-delay="1"].is-in { transition-delay: 0.1s; }
+[data-delay="2"].is-in { transition-delay: 0.22s; }
+[data-delay="3"].is-in { transition-delay: 0.36s; }
+[data-delay="4"].is-in { transition-delay: 0.5s; }
+
+/* How-it-works cards: slightly more dramatic pop */
+.how-card[data-reveal] {
+  transform: translate3d(0, 40px, 0) scale(0.96);
+}
+.how-card[data-reveal].is-in {
+  transform: translate3d(0, 0, 0) scale(1);
+}
+.how-arrow[data-reveal] {
+  transform: translate3d(-12px, 0, 0);
+  opacity: 0;
+}
+.how-arrow[data-reveal].is-in {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+}
+
+@keyframes badge-pop {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+.how-card.is-in .how-badge {
+  animation: badge-pop 0.55s var(--ease-out-expo) 0.28s both;
+}
+.how-card.is-in .how-icon {
+  animation: load-fade-up 0.7s var(--ease-out-expo) 0.12s both;
+}
+
+/* Satellite sky soft-scales as the section lands */
+[data-sat] .sat-panel-bg,
+[data-sat] .sat-panel-blur {
+  opacity: 0;
+  transform: scale(0.94);
+  transition:
+    opacity 1.25s var(--ease-out-soft),
+    transform 1.25s var(--ease-out-soft);
+  transform-origin: center center;
+}
+[data-sat].is-in .sat-panel-bg,
+[data-sat].is-in .sat-panel-blur {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .animate-in,
+  .nav-load,
+  .hero-line-inner,
+  .widget-load,
+  .site-bg,
+  .site-dots {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  [data-reveal],
+  [data-stagger] > *,
+  [data-sat] .sat-panel-bg,
+  [data-sat] .sat-panel-blur {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .how-card.is-in .how-badge,
+  .how-card.is-in .how-icon {
+    animation: none !important;
+  }
+}

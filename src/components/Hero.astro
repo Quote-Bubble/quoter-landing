@@ -1,0 +1,66 @@
+---
+import LiveWidget from "./LiveWidget.astro";
+---
+
+<section class="relative">
+  <div class="relative z-10 mx-auto max-w-6xl px-6 pt-60 pb-24 text-center sm:pt-64">
+    <!-- headline — each line clip-reveals on load -->
+    <h1 class="font-display mx-auto max-w-4xl text-[clamp(2.6rem,6.4vw,4.7rem)] leading-[1.03] text-ink">
+      <span class="hero-line">
+        <span class="hero-line-inner">Instant Roof Quotes,</span>
+      </span>
+      <span class="hero-line">
+        <span class="hero-line-inner">Not Site Visits.</span>
+      </span>
+    </h1>
+
+    <!-- subtext -->
+    <p class="animate-in delay-3 mx-auto mt-6 max-w-xl text-[17px] leading-relaxed text-ink-soft">
+      Get a free ballpark price for your roof in seconds, measured from
+      satellite with no ladders and no pushy sales visit. Book a trusted local
+      roofer only when you're ready.
+    </p>
+
+    <!-- CTAs -->
+    <div class="animate-in delay-4 mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+      <button
+        type="button"
+        data-try
+        class="btn-primary inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-[15px] font-semibold sm:w-auto"
+      >
+        Try a live quote
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a
+        href="#how"
+        class="btn-ghost inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-[15px] font-semibold sm:w-auto"
+      >
+        How it works
+      </a>
+    </div>
+
+    <!-- product visual: the interactive live-quote widget -->
+    <div class="mx-auto mt-20 max-w-[620px] widget-load">
+      <LiveWidget />
+    </div>
+  </div>
+</section>
+
+<script>
+  // "Try a live quote" focuses the widget's address field.
+  function initTryCta() {
+    const card = document.getElementById("quoter-widget");
+    if (!card) return;
+    document.querySelectorAll("[data-try]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        card.scrollIntoView({ behavior: "smooth", block: "center" });
+        const input = card.querySelector("[data-input]") as HTMLInputElement | null;
+        window.setTimeout(() => input?.focus({ preventScroll: true }), 500);
+      });
+    });
+  }
+  initTryCta();
+  document.addEventListener("astro:after-swap", initTryCta);
+</script>
