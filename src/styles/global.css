@@ -42,7 +42,10 @@ html {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
+  /* clip (with hidden fallback) — clip never creates a scroll container, so
+     vertical scrolling stays native and sideways rubber-banding is impossible */
   overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100%;
   /* Blend the classic scrollbar into the page instead of a stark white track */
   scrollbar-width: thin;
@@ -69,9 +72,10 @@ html {
 body {
   position: relative;
   min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100svh;
   max-width: 100%;
   overflow-x: hidden;
+  overflow-x: clip;
   background-color: var(--color-canvas);
   color: var(--color-ink);
   font-family: var(--font-sans);
@@ -92,13 +96,14 @@ main {
   left: 50%;
   width: 100%;
   max-width: 100%;
-  /* Tall enough to hand off into the satellite sky */
-  height: max(1900px, 220vh);
+  /* Fixed px geometry — never viewport-relative, so browser chrome, the
+     keyboard, and the widget expanding can NEVER move or resize the blob. */
+  height: 1900px;
   z-index: -2;
   background-image: url("/bg-v3.webp");
   background-repeat: no-repeat;
-  /* Viewport-relative anchor: blob core sits behind the hero search cluster */
-  background-position: center 42vh;
+  /* Page-anchored: blob core sits behind the hero search cluster */
+  background-position: center 380px;
   background-size: min(1600px, 130vw) auto;
   filter: blur(14px);
   /* Center without negative left/right — those caused horizontal scroll */
@@ -126,8 +131,10 @@ main {
 }
 @media (max-width: 640px) {
   .site-bg {
-    /* Same relative seat as desktop: behind mid–lower hero (CTAs + search) */
-    background-position: center 56vh;
+    /* Same relative seat as desktop: behind mid–lower hero (CTAs + search).
+       px-anchored so keyboard / URL-bar changes never shift it. */
+    height: 1650px;
+    background-position: center 400px;
     background-size: 160% auto;
   }
 }
@@ -209,7 +216,7 @@ main {
 /* Pull lower page up so satellite sky overlaps the blob’s fade tail */
 .page-lower {
   position: relative;
-  margin-top: 0;
+  margin-top: -2.5rem;
   overflow-x: clip;
 }
 @media (min-width: 640px) {
