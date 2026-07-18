@@ -92,50 +92,38 @@ main {
    The mask wraps the blob tightly around the bottom of the search widget. */
 .site-bg {
   position: absolute;
-  top: 0;
+  top: -90px;
   left: 50%;
-  width: 100%;
-  max-width: 100%;
+  /* Bleed 90px past each edge like the original vibrant version — the blur
+     never reveals a soft edge inside the viewport. Centered via transform +
+     clipped by html/body overflow-x: clip, so it can't cause sideways scroll. */
+  width: calc(100% + 180px);
   /* Fixed px geometry — never viewport-relative, so browser chrome, the
      keyboard, and the widget expanding can NEVER move or resize the blob. */
-  height: 1900px;
+  height: 1600px;
   z-index: -2;
   background-image: url("/bg-v3.webp");
   background-repeat: no-repeat;
-  /* Page-anchored: blob core sits behind the hero search cluster */
-  background-position: center 380px;
-  background-size: min(1600px, 130vw) auto;
+  /* Original vibrant geometry: image spans the full bleed width (cover-like,
+     scales up with the screen) with its core behind the hero search cluster */
+  background-position: center 300px;
+  background-size: 100% auto;
   filter: blur(14px);
-  /* Center without negative left/right — those caused horizontal scroll */
   transform: translateX(-50%);
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    #000 0%,
-    #000 48%,
-    rgba(0, 0, 0, 0.85) 58%,
-    rgba(0, 0, 0, 0.45) 72%,
-    rgba(0, 0, 0, 0.12) 86%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    #000 0%,
-    #000 48%,
-    rgba(0, 0, 0, 0.85) 58%,
-    rgba(0, 0, 0, 0.45) 72%,
-    rgba(0, 0, 0, 0.12) 86%,
-    transparent 100%
-  );
+  /* Simple long fade like the loved original — keeps the core fully solid */
+  -webkit-mask-image: linear-gradient(to bottom, #000 50%, transparent 84%);
+  mask-image: linear-gradient(to bottom, #000 50%, transparent 84%);
   pointer-events: none;
   contain: paint;
 }
 @media (max-width: 640px) {
   .site-bg {
     /* Same relative seat as desktop: behind mid–lower hero (CTAs + search).
-       px-anchored so keyboard / URL-bar changes never shift it. */
+       px-anchored so keyboard / URL-bar changes never shift it.
+       (Values compensate for the base layer's -90px top / +180px bleed.) */
     height: 1650px;
-    background-position: center 400px;
-    background-size: 160% auto;
+    background-position: center 490px;
+    background-size: 110% auto;
   }
 }
 
