@@ -9,8 +9,8 @@ const roofPath =
   "M277 356 L277 408 L277 480 L277 508 L308 512 L335 517 L339 533 L339 544 L411 545 L474 545 L534 545 L571 547 L625 548 L677 548 L724 551 L725 534 L774 526 L789 513 L807 490 L808 450 L794 428 L784 423 L784 387 L783 341 L777 318 L778 287 L778 255 L725 245 L669 241 L616 239 L611 201 L600 200 L601 141 L546 138 L494 140 L482 140 L479 197 L469 207 L467 239 L362 239 L357 324 L341 334 L342 354 L314 357 Z";
 ---
 
-<section id="tech" class="relative w-full py-20 sm:py-28" data-sat data-reveal="fade">
-  <!-- Full-bleed sky: sized to the viewport so the fade can die out before any edge -->
+<section id="tech" class="relative w-full pt-8 pb-20 sm:pt-12 sm:pb-28" data-sat data-reveal="fade">
+  <!-- Full-bleed sky: reaches up into the hero blob’s fade for a continuous handoff -->
   <div class="sat-panel-bg" aria-hidden="true">
     <canvas class="sat-clouds" data-clouds></canvas>
   </div>
@@ -97,11 +97,11 @@ const roofPath =
      page; corners soften naturally where both axes fade. */
   .sat-panel-bg {
     position: absolute;
-    top: -260px;
+    /* Reach well into the hero so blob + sky overlap in the same band */
+    top: -380px;
     bottom: -200px;
     left: 0;
     right: 0;
-    /* Blob blues + visible cloud blobs (also shows if WebGL is skipped) */
     background:
       radial-gradient(ellipse 48% 32% at 18% 34%, rgba(255, 255, 255, 0.72), transparent 68%),
       radial-gradient(ellipse 42% 28% at 68% 38%, rgba(255, 255, 255, 0.65), transparent 66%),
@@ -109,25 +109,27 @@ const roofPath =
       radial-gradient(ellipse 34% 24% at 82% 62%, rgba(255, 255, 255, 0.55), transparent 65%),
       radial-gradient(ellipse 30% 20% at 28% 70%, rgba(220, 235, 255, 0.4), transparent 68%),
       linear-gradient(180deg, #1f57f0 0%, #2f6bff 45%, #4f8bff 100%);
+    /* Soft wide band — longer TOP fade so it dissolves into the blob */
     -webkit-mask-image:
       linear-gradient(
         to right,
         transparent 0%,
-        rgba(0, 0, 0, 0.15) 6%,
-        rgba(0, 0, 0, 0.55) 14%,
-        #000 24%,
-        #000 76%,
-        rgba(0, 0, 0, 0.55) 86%,
-        rgba(0, 0, 0, 0.15) 94%,
+        rgba(0, 0, 0, 0.12) 5%,
+        rgba(0, 0, 0, 0.5) 12%,
+        #000 22%,
+        #000 78%,
+        rgba(0, 0, 0, 0.5) 88%,
+        rgba(0, 0, 0, 0.12) 95%,
         transparent 100%
       ),
       linear-gradient(
         to bottom,
         transparent 0%,
-        rgba(0, 0, 0, 0.15) 8%,
-        rgba(0, 0, 0, 0.55) 16%,
-        #000 26%,
-        #000 74%,
+        rgba(0, 0, 0, 0.08) 10%,
+        rgba(0, 0, 0, 0.35) 20%,
+        rgba(0, 0, 0, 0.75) 32%,
+        #000 42%,
+        #000 72%,
         rgba(0, 0, 0, 0.55) 84%,
         rgba(0, 0, 0, 0.15) 92%,
         transparent 100%
@@ -137,21 +139,22 @@ const roofPath =
       linear-gradient(
         to right,
         transparent 0%,
-        rgba(0, 0, 0, 0.15) 6%,
-        rgba(0, 0, 0, 0.55) 14%,
-        #000 24%,
-        #000 76%,
-        rgba(0, 0, 0, 0.55) 86%,
-        rgba(0, 0, 0, 0.15) 94%,
+        rgba(0, 0, 0, 0.12) 5%,
+        rgba(0, 0, 0, 0.5) 12%,
+        #000 22%,
+        #000 78%,
+        rgba(0, 0, 0, 0.5) 88%,
+        rgba(0, 0, 0, 0.12) 95%,
         transparent 100%
       ),
       linear-gradient(
         to bottom,
         transparent 0%,
-        rgba(0, 0, 0, 0.15) 8%,
-        rgba(0, 0, 0, 0.55) 16%,
-        #000 26%,
-        #000 74%,
+        rgba(0, 0, 0, 0.08) 10%,
+        rgba(0, 0, 0, 0.35) 20%,
+        rgba(0, 0, 0, 0.75) 32%,
+        #000 42%,
+        #000 72%,
         rgba(0, 0, 0, 0.55) 84%,
         rgba(0, 0, 0, 0.15) 92%,
         transparent 100%
@@ -161,7 +164,7 @@ const roofPath =
   }
   @media (max-width: 640px) {
     .sat-panel-bg {
-      top: -160px;
+      top: -240px;
       bottom: -120px;
     }
   }
@@ -456,11 +459,13 @@ void main() {
   float midN = fbm(p * 1.5 - wind + 3.7);
   float fine = fbm(p * 2.6 - wind * 1.2 + 8.0);
   float n = large * 0.5 + midN * 0.35 + fine * 0.15;
-  vec3 sky = mix(u_colorBottom, u_colorMid, uv.y * 0.45);
-  /* Lower thresholds = obvious cloud masses on the blue */
+  /* Slightly brighter toward the top so it matches the washed blob edge */
+  vec3 sky = mix(u_colorMid, u_colorBottom, uv.y * 0.55);
   float cover = smoothstep(0.28, 0.5, n);
   float peaks = smoothstep(0.42, 0.65, n);
   float clouds = clamp(cover * 0.9 + peaks * 0.7, 0.0, 1.0);
+  /* Soften cloud intensity near the top handoff into the blob */
+  clouds *= mix(0.55, 1.0, smoothstep(0.0, 0.45, uv.y));
   gl_FragColor = vec4(mix(sky, u_colorTop, clouds), 1.0);
 }
 `;
@@ -470,7 +475,7 @@ void main() {
     [79 / 255, 139 / 255, 255 / 255],  // #4f8bff — blob mid
     [1.0, 1.0, 1.0],                  // bright cloud tops
   ];
-  const CLOUD_VER = "blob-2";
+  const CLOUD_VER = "blob-3";
   const RES_SCALE = 1;
   const FRAME_MS = 1000 / 24;
 

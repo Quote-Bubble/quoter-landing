@@ -83,16 +83,33 @@ body {
   top: -90px;
   left: -90px;
   right: -90px;
-  height: 1600px;
+  /* Taller so the blob still reaches into the satellite sky */
+  height: 1900px;
   z-index: -2;
   background-image: url("/bg-v3.webp");
   background-repeat: no-repeat;
   background-position: center 300px;
   background-size: cover;
-  /* Soft pre-blurred art — keep runtime blur modest (30px was a compositor tax) */
   filter: blur(14px);
-  -webkit-mask-image: linear-gradient(to bottom, #000 50%, transparent 84%);
-  mask-image: linear-gradient(to bottom, #000 50%, transparent 84%);
+  /* Hold longer, then a long soft tail into the clouds (no hard cut) */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 48%,
+    rgba(0, 0, 0, 0.85) 58%,
+    rgba(0, 0, 0, 0.45) 72%,
+    rgba(0, 0, 0, 0.12) 86%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 48%,
+    rgba(0, 0, 0, 0.85) 58%,
+    rgba(0, 0, 0, 0.45) 72%,
+    rgba(0, 0, 0, 0.12) 86%,
+    transparent 100%
+  );
   pointer-events: none;
   contain: paint;
 }
@@ -171,10 +188,15 @@ body {
   box-shadow: var(--shadow-soft);
 }
 
-/* Lower sections sit directly on the page — the blob has already faded out
-   by here via its own mask, so no white overlay (and no seam) is needed. */
+/* Pull lower page up so satellite sky overlaps the blob’s fade tail */
 .page-lower {
   position: relative;
+  margin-top: -4.5rem;
+}
+@media (min-width: 640px) {
+  .page-lower {
+    margin-top: -6.5rem;
+  }
 }
 
 /* Small uppercase section label */

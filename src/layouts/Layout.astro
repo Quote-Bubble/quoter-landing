@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import SpeedInsights from "@vercel/speed-insights/astro";
 
 interface Props {
   title?: string;
@@ -36,6 +37,8 @@ const {
       <script src="https://cdn.quoter.app/embed.js" data-quoter="YOUR_SITE_KEY" defer></script>
       It replaces the placeholder demo in DemoSection.astro (#quoter-widget).
     */}
+
+    <SpeedInsights />
   </body>
 </html>
 
