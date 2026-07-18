@@ -121,7 +121,7 @@ const presets = ["12 Oakfield Road, Leeds", "4 Elm Grove, Bristol", "27 Hillside
   .q-search-icon { flex: none; }
   .q-search input {
     flex: 1; min-width: 0; border: none; outline: none; background: transparent;
-    font-size: 16px; color: var(--color-ink);
+    font-size: 16px; color: var(--color-ink); /* 16px avoids iOS zoom */
   }
   .q-go {
     flex: none;
@@ -145,6 +145,58 @@ const presets = ["12 Oakfield Road, Leeds", "4 Elm Grove, Bristol", "27 Hillside
     transition: all 0.15s ease; cursor: pointer;
   }
   .q-chip:hover { border-color: var(--color-brand-400); color: var(--color-brand-600); background: #fff; }
+
+  @media (max-width: 520px) {
+    .q {
+      border-radius: 20px;
+      padding: 12px;
+    }
+    .q-search {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      grid-template-areas:
+        "icon input"
+        "go go";
+      align-items: center;
+      gap: 10px 8px;
+      padding: 12px;
+      border-radius: 16px;
+    }
+    .q-search-icon { grid-area: icon; }
+    .q-search input {
+      grid-area: input;
+      width: 100%;
+      min-width: 0;
+    }
+    .q-go {
+      grid-area: go;
+      width: 100%;
+      justify-content: center;
+      padding: 12px 16px;
+      border-radius: 12px;
+    }
+    /* One horizontal row — no awkward chip wrap */
+    .q-presets {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 0 2px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .q-presets::-webkit-scrollbar { display: none; }
+    .q-presets-label { flex: none; }
+    .q-chip {
+      flex: none;
+      font-size: 12px;
+      padding: 6px 11px;
+      white-space: nowrap;
+    }
+    .q-result-price { font-size: 26px; }
+  }
 
   /* result */
   .q-addressbar {

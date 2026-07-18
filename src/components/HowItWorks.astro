@@ -21,18 +21,18 @@ const steps = [
 ];
 ---
 
-<section id="how" class="relative mx-auto max-w-6xl px-6 py-24 sm:py-28">
+<section id="how" class="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-28">
   <div class="mx-auto max-w-2xl text-center" data-reveal>
     <span class="section-label">How it works</span>
-    <h2 class="font-display mt-4 text-[clamp(2.1rem,4.6vw,3.1rem)] leading-[1.05] text-ink">
+    <h2 class="font-display mt-4 text-[clamp(1.85rem,6vw,3.1rem)] leading-[1.05] text-ink">
       Getting your quote is simple.
     </h2>
-    <p class="mx-auto mt-4 max-w-lg text-[18px] leading-relaxed text-ink-soft">
+    <p class="mx-auto mt-4 max-w-lg text-[16px] leading-relaxed text-ink-soft sm:text-[18px]">
       Three easy steps, about a minute of your time, and absolutely no obligation.
     </p>
   </div>
 
-  <div class="mt-16 flex flex-col gap-6 lg:flex-row lg:items-stretch lg:gap-3">
+  <div class="mt-10 flex flex-col gap-5 sm:mt-16 sm:gap-6 lg:flex-row lg:items-stretch lg:gap-3">
     {steps.map((s, i) => (
       <Fragment>
         <div class="how-card" data-reveal data-delay={String(i + 1)}>
@@ -61,12 +61,17 @@ const steps = [
     flex: 1;
     background: #fff;
     border-radius: 28px;
-    padding: 36px 28px;
+    padding: 28px 22px;
     text-align: center;
     box-shadow:
       0 1px 2px rgba(16, 24, 40, 0.04),
       0 24px 50px -30px rgba(23, 60, 160, 0.35);
     border: 1px solid var(--color-line);
+  }
+  @media (min-width: 640px) {
+    .how-card {
+      padding: 36px 28px;
+    }
   }
   .how-icon {
     position: relative;

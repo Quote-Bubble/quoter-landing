@@ -9,14 +9,14 @@ const roofPath =
   "M277 356 L277 408 L277 480 L277 508 L308 512 L335 517 L339 533 L339 544 L411 545 L474 545 L534 545 L571 547 L625 548 L677 548 L724 551 L725 534 L774 526 L789 513 L807 490 L808 450 L794 428 L784 423 L784 387 L783 341 L777 318 L778 287 L778 255 L725 245 L669 241 L616 239 L611 201 L600 200 L601 141 L546 138 L494 140 L482 140 L479 197 L469 207 L467 239 L362 239 L357 324 L341 334 L342 354 L314 357 Z";
 ---
 
-<section id="tech" class="relative w-full pt-8 pb-20 sm:pt-12 sm:pb-28" data-sat data-reveal="fade">
+<section id="tech" class="relative w-full pt-6 pb-16 sm:pt-12 sm:pb-28" data-sat data-reveal="fade">
   <!-- Full-bleed sky: reaches up into the hero blob’s fade for a continuous handoff -->
   <div class="sat-panel-bg" aria-hidden="true">
     <canvas class="sat-clouds" data-clouds></canvas>
   </div>
 
   <div class="relative z-10 mx-auto max-w-5xl px-4 sm:px-6">
-    <div class="sat-inner px-6 py-14 sm:px-10 sm:py-20 lg:px-14 lg:py-24">
+    <div class="sat-inner px-4 py-10 sm:px-10 sm:py-20 lg:px-14 lg:py-24">
       <div class="sat-layout">
         <div class="sat-copy" data-reveal="left">
           <span class="section-label sat-label">From above</span>
@@ -102,6 +102,8 @@ const roofPath =
     bottom: -200px;
     left: 0;
     right: 0;
+    max-width: 100%;
+    overflow: hidden;
     background:
       radial-gradient(ellipse 48% 32% at 18% 34%, rgba(255, 255, 255, 0.72), transparent 68%),
       radial-gradient(ellipse 42% 28% at 68% 38%, rgba(255, 255, 255, 0.65), transparent 66%),
@@ -162,10 +164,49 @@ const roofPath =
     mask-composite: intersect;
     pointer-events: none;
   }
+  /* Mobile: near full-bleed sky like desktop (was a thin center stripe) */
   @media (max-width: 640px) {
     .sat-panel-bg {
-      top: -240px;
-      bottom: -120px;
+      top: -80px;
+      bottom: -60px;
+      -webkit-mask-image:
+        linear-gradient(
+          to right,
+          transparent 0%,
+          rgba(0, 0, 0, 0.35) 3%,
+          #000 8%,
+          #000 92%,
+          rgba(0, 0, 0, 0.35) 97%,
+          transparent 100%
+        ),
+        linear-gradient(
+          to bottom,
+          transparent 0%,
+          rgba(0, 0, 0, 0.25) 6%,
+          #000 16%,
+          #000 82%,
+          rgba(0, 0, 0, 0.35) 92%,
+          transparent 100%
+        );
+      mask-image:
+        linear-gradient(
+          to right,
+          transparent 0%,
+          rgba(0, 0, 0, 0.35) 3%,
+          #000 8%,
+          #000 92%,
+          rgba(0, 0, 0, 0.35) 97%,
+          transparent 100%
+        ),
+        linear-gradient(
+          to bottom,
+          transparent 0%,
+          rgba(0, 0, 0, 0.25) 6%,
+          #000 16%,
+          #000 82%,
+          rgba(0, 0, 0, 0.35) 92%,
+          transparent 100%
+        );
     }
   }
   .sat-clouds {
@@ -189,6 +230,16 @@ const roofPath =
     );
     pointer-events: none;
   }
+  @media (max-width: 640px) {
+    .sat-panel-bg::after {
+      background: radial-gradient(
+        ellipse 90% 55% at 50% 28%,
+        rgba(20, 60, 180, 0.4) 0%,
+        rgba(31, 87, 240, 0.14) 50%,
+        transparent 75%
+      );
+    }
+  }
 
   .sat-layout {
     display: grid;
@@ -207,6 +258,15 @@ const roofPath =
     text-align: center;
     max-width: 22rem;
     margin-inline: auto;
+  }
+  @media (max-width: 640px) {
+    .sat-copy h2 {
+      font-size: clamp(1.55rem, 7vw, 1.9rem);
+    }
+    .sat-copy p {
+      font-size: 14.5px;
+      margin-inline: auto;
+    }
   }
   @media (min-width: 1024px) {
     .sat-copy {

@@ -43,6 +43,7 @@ html {
   text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
   overflow-x: hidden;
+  max-width: 100%;
   /* Blend the classic scrollbar into the page instead of a stark white track */
   scrollbar-width: thin;
   scrollbar-color: rgba(47, 107, 255, 0.35) transparent;
@@ -69,9 +70,16 @@ body {
   position: relative;
   min-height: 100vh;
   min-height: 100dvh;
+  max-width: 100%;
+  overflow-x: hidden;
   background-color: var(--color-canvas);
   color: var(--color-ink);
   font-family: var(--font-sans);
+}
+
+main {
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 /* Gradient wallpaper — absolute (not fixed) so it's inked onto the page and
@@ -80,18 +88,21 @@ body {
    The mask wraps the blob tightly around the bottom of the search widget. */
 .site-bg {
   position: absolute;
-  top: -90px;
-  left: -90px;
-  right: -90px;
-  /* Taller so the blob still reaches into the satellite sky */
-  height: 1900px;
+  top: 0;
+  left: 50%;
+  width: 100%;
+  max-width: 100%;
+  /* Tall enough to hand off into the satellite sky */
+  height: max(1900px, 220vh);
   z-index: -2;
   background-image: url("/bg-v3.webp");
   background-repeat: no-repeat;
-  background-position: center 300px;
-  background-size: cover;
+  /* Viewport-relative anchor: blob core sits behind the hero search cluster */
+  background-position: center 42vh;
+  background-size: min(1600px, 130vw) auto;
   filter: blur(14px);
-  /* Hold longer, then a long soft tail into the clouds (no hard cut) */
+  /* Center without negative left/right — those caused horizontal scroll */
+  transform: translateX(-50%);
   -webkit-mask-image: linear-gradient(
     to bottom,
     #000 0%,
@@ -112,6 +123,13 @@ body {
   );
   pointer-events: none;
   contain: paint;
+}
+@media (max-width: 640px) {
+  .site-bg {
+    /* Same relative seat as desktop: behind mid–lower hero (CTAs + search) */
+    background-position: center 56vh;
+    background-size: 160% auto;
+  }
 }
 
 /* Really faint dot-matrix for a touch of texture/depth */
@@ -191,7 +209,8 @@ body {
 /* Pull lower page up so satellite sky overlaps the blob’s fade tail */
 .page-lower {
   position: relative;
-  margin-top: -4.5rem;
+  margin-top: 0;
+  overflow-x: clip;
 }
 @media (min-width: 640px) {
   .page-lower {
@@ -245,8 +264,8 @@ body {
   to   { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 @keyframes load-blob {
-  from { opacity: 0; transform: scale(0.92); }
-  to   { opacity: 1; transform: scale(1); }
+  from { opacity: 0; transform: translateX(-50%) scale(0.92); }
+  to   { opacity: 1; transform: translateX(-50%) scale(1); }
 }
 @keyframes load-dots {
   from { opacity: 0; }
@@ -294,6 +313,7 @@ body {
 .site-bg {
   opacity: 0;
   transform-origin: center 40%;
+  /* keep translateX(-50%) from base so load anim doesn't un-center the blob */
   animation: load-blob 1.4s var(--ease-out-soft) 0.12s forwards;
 }
 .site-dots {
@@ -392,8 +412,13 @@ body {
   .site-dots {
     animation: none !important;
     opacity: 1 !important;
-    transform: none !important;
     filter: none !important;
+  }
+  .site-bg {
+    transform: translateX(-50%) !important;
+  }
+  .site-dots {
+    transform: none !important;
   }
   [data-reveal],
   [data-stagger] > *,
