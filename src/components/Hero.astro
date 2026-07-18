@@ -37,10 +37,10 @@ const heroLines = lines.map((line) =>
       </h1>
 
       <p class="sub-load hero-sub mx-auto max-w-xl leading-relaxed text-ink-soft">
-        Enter your address and see a real price in seconds, measured by
-        satellite. <strong class="font-semibold text-brand-600">Completely
-        free</strong>, no obligation, and nobody comes to your door until
-        you ask.
+        Type in your address and Quoter
+        <span class="accent-sat">measures your roof from satellite photos</span>,
+        giving you a <strong class="font-semibold text-brand-600">free estimate</strong>
+        in seconds. No appointments, no phone calls, and no pressure.
       </p>
 
       <div class="cta-load hero-ctas flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -70,6 +70,15 @@ const heroLines = lines.map((line) =>
 </section>
 
 <style>
+  /* Artistic accent: the satellite phrase carries a soft blue gradient */
+  .accent-sat {
+    font-weight: 550;
+    background: linear-gradient(92deg, #1f57f0 0%, #2f6bff 55%, #4f8bff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
   .hero-stage {
     justify-content: center;
     padding-top: max(5.75rem, calc(env(safe-area-inset-top, 0px) + 4.5rem));
