@@ -536,7 +536,7 @@ void main() {
   vec2 uv = gl_FragCoord.xy / u_resolution;
   vec2 p = (uv - 0.5) * vec2(u_resolution.x / max(u_resolution.y, 1.0), 1.0);
   p = mat2(0.96, 0.28, -0.28, 0.96) * p;
-  vec2 wind = vec2(u_time * 0.035, u_time * 0.01);
+  vec2 wind = vec2(u_time * 0.085, u_time * 0.024);
   float large = fbm(p * 0.75 - wind * 0.45);
   float midN = fbm(p * 1.5 - wind + 3.7);
   float fine = fbm(p * 2.6 - wind * 1.2 + 8.0);
