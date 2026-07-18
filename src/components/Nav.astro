@@ -2,7 +2,7 @@
 import Logo from "./Logo.astro";
 ---
 
-<header class="absolute inset-x-0 top-0 z-50 nav-load">
+<header class="absolute inset-x-0 top-0 z-50 nav-load" data-static-nav>
   <nav class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-6 sm:py-5">
     <a href="/" class="flex min-w-0 items-center gap-2 sm:gap-2.5" aria-label="Quoter home">
       <Logo size={28} />
@@ -22,3 +22,103 @@ import Logo from "./Logo.astro";
     </button>
   </nav>
 </header>
+
+<!-- Floating frosted pill — slides in once the static nav scrolls out of view -->
+<div class="glass-nav" data-glass-nav inert>
+  <a href="/" class="flex items-center gap-2" aria-label="Quoter home">
+    <Logo size={24} />
+    <span class="text-[15px] font-semibold tracking-tight text-ink">Quoter</span>
+  </a>
+
+  <span class="glass-nav-divider" aria-hidden="true"></span>
+
+  <a href="#how" class="hidden text-[13.5px] font-medium text-ink-soft transition-colors hover:text-ink sm:block">
+    How it works
+  </a>
+
+  <button
+    type="button"
+    data-try
+    class="btn-primary inline-flex shrink-0 items-center rounded-full px-3.5 py-1.5 text-[13px] font-semibold"
+  >
+    Get my quote
+  </button>
+</div>
+
+<style>
+  .glass-nav {
+    position: fixed;
+    top: max(10px, env(safe-area-inset-top, 0px));
+    left: 50%;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 7px 7px 7px 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(24px) saturate(1.7);
+    -webkit-backdrop-filter: blur(24px) saturate(1.7);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.7) inset,
+      0 2px 6px rgba(16, 24, 40, 0.05),
+      0 18px 44px -18px rgba(23, 60, 160, 0.35);
+    /* Hidden above the viewport until the static nav scrolls away */
+    transform: translate(-50%, calc(-100% - 24px));
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 0.65s var(--ease-out-expo),
+      opacity 0.45s ease;
+    max-width: calc(100vw - 24px);
+  }
+  .glass-nav.is-shown {
+    transform: translate(-50%, 0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .glass-nav-divider {
+    width: 1px;
+    height: 18px;
+    background: rgba(10, 11, 13, 0.1);
+  }
+  @media (max-width: 639px) {
+    .glass-nav-divider { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glass-nav {
+      transition: opacity 0.2s ease;
+      transform: translate(-50%, 0);
+    }
+    .glass-nav:not(.is-shown) {
+      visibility: hidden;
+    }
+  }
+</style>
+
+<script>
+  // Show the frosted pill once the static nav is fully out of view.
+  // IntersectionObserver: passive, no per-frame scroll listener cost.
+  function initGlassNav() {
+    const staticNav = document.querySelector("[data-static-nav]");
+    const glass = document.querySelector("[data-glass-nav]") as HTMLElement | null;
+    if (!staticNav || !glass || glass.dataset.bound) return;
+    glass.dataset.bound = "1";
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        const show = !entry.isIntersecting;
+        glass.classList.toggle("is-shown", show);
+        if (show) glass.removeAttribute("inert");
+        else glass.setAttribute("inert", "");
+      },
+      { threshold: 0 }
+    );
+    io.observe(staticNav);
+  }
+  initGlassNav();
+  document.addEventListener("astro:after-swap", initGlassNav);
+</script>
