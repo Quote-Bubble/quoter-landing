@@ -122,7 +122,7 @@ main {
        the glass search bar (not below it), big enough to hug it with soft
        edges. px-anchored so keyboard / URL-bar changes never shift it. */
     height: 1650px;
-    background-position: center 260px;
+    background-position: center 380px;
     background-size: 140% auto;
     /* Mobile-tuned blend: stay solid through the widget zone, then a long
        soft dissolve into the sky section */
