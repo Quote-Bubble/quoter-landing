@@ -37,7 +37,8 @@ const roofPath =
                 alt=""
                 width="640"
                 height="480"
-                loading="lazy"
+                loading="eager"
+                fetchpriority="low"
                 decoding="async"
               />
 
@@ -331,6 +332,8 @@ const roofPath =
     inset: 0;
     transform: scale(1);
     transform-origin: center center;
+    /* Pre-promote: the zoom layer is composited at load, not at scroll-in */
+    will-change: transform;
   }
 
   .sat-photo {
@@ -642,7 +645,9 @@ void main() {
       const t0 = performance.now();
 
       const resize = () => {
-        const dpr = Math.min(window.devicePixelRatio || 1, 2) * RES_SCALE;
+        // Clouds are soft-focus: render at 1x and let the compositor upscale.
+        // Indistinguishable for fbm noise, ~4x fewer shaded pixels on retina.
+        const dpr = Math.min(window.devicePixelRatio || 1, 1) * RES_SCALE;
         const rect = host.getBoundingClientRect();
         const w = Math.max(1, Math.floor(rect.width * dpr));
         const h = Math.max(1, Math.floor(rect.height * dpr));
