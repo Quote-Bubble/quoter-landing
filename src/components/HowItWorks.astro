@@ -1,22 +1,19 @@
 ---
 const steps = [
   {
-    n: "1",
+    n: "01",
     title: "Enter your address",
     body: "Type in the address of your home. That is all we need to get started. No forms and no phone number.",
-    icon: `<path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="2"/>`,
   },
   {
-    n: "2",
+    n: "02",
     title: "We measure your roof",
     body: "Quoter looks at satellite photos of your home and works out the size and shape of your roof in a few seconds.",
-    icon: `<path d="M3 11 12 4l9 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 10v9h14v-9" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>`,
   },
   {
-    n: "3",
+    n: "03",
     title: "See your price",
     body: "You see a price range for the work straight away. If you want to go ahead, a local roofer visits to confirm the exact price. That visit is free too.",
-    icon: `<path d="M4 13 12 5l7 .5.5 7L11.5 20a2 2 0 0 1-2.8 0L4 15.8a2 2 0 0 1 0-2.8Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="15" cy="9" r="1.4" fill="currentColor"/>`,
   },
 ];
 ---
@@ -32,21 +29,35 @@ const steps = [
     </p>
   </div>
 
-  <div class="mt-10 flex flex-col gap-5 sm:mt-16 sm:gap-6 lg:flex-row lg:items-stretch lg:gap-3">
+  <div class="how-track mt-12 sm:mt-20" data-how-track>
     {steps.map((s, i) => (
       <Fragment>
-        <div class="how-card" data-reveal data-delay={String(i + 1)}>
-          <div class="how-icon">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" set:html={s.icon} />
-            <span class="how-badge">{s.n}</span>
-          </div>
-          <h3 class="font-display mt-6 text-[24px] leading-tight text-ink">{s.title}</h3>
-          <p class="mx-auto mt-3 max-w-xs text-[16.5px] leading-relaxed text-ink-soft">{s.body}</p>
+        <div class="how-step" data-reveal data-delay={String(i + 1)}>
+          <span class="how-num" aria-hidden="true">{s.n}</span>
+          <h3 class="font-display how-title">{s.title}</h3>
+          <p class="how-body">{s.body}</p>
         </div>
         {i < steps.length - 1 && (
-          <div class="how-arrow" aria-hidden="true" data-reveal data-delay={String(i + 1)}>
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
-              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <div class="how-line" aria-hidden="true" data-how-line>
+            <svg class="how-line-svg" viewBox="0 0 80 24" preserveAspectRatio="none">
+              <path
+                class="how-line-path"
+                d="M4 12 H76"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </svg>
+            <svg class="how-line-svg how-line-svg--vert" viewBox="0 0 24 48" preserveAspectRatio="none">
+              <path
+                class="how-line-path"
+                d="M12 4 V44"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
             </svg>
           </div>
         )}
@@ -56,60 +67,141 @@ const steps = [
 </section>
 
 <style>
-  .how-card {
-    position: relative;
-    flex: 1;
-    background: #fff;
-    border-radius: 28px;
-    padding: 28px 22px;
-    text-align: center;
-    box-shadow:
-      0 1px 2px rgba(16, 24, 40, 0.04),
-      0 24px 50px -30px rgba(23, 60, 160, 0.35);
-    border: 1px solid var(--color-line);
-  }
-  @media (min-width: 640px) {
-    .how-card {
-      padding: 36px 28px;
-    }
-  }
-  .how-icon {
-    position: relative;
-    margin: 0 auto;
-    width: 68px;
-    height: 68px;
+  .how-track {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 20px;
-    background: linear-gradient(160deg, var(--color-brand-50), #dfeaff);
-    color: var(--color-brand-600);
-  }
-  .how-badge {
-    position: absolute;
-    top: -10px;
-    right: -10px;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: linear-gradient(180deg, var(--color-brand-500), var(--color-brand-600));
-    color: #fff;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 15px;
-    box-shadow: 0 6px 14px -4px rgba(31, 87, 240, 0.6);
-    border: 2px solid #fff;
-  }
-  .how-arrow {
-    display: none;
-    flex: none;
-    align-items: center;
-    color: var(--color-brand-300);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
   }
   @media (min-width: 1024px) {
-    .how-arrow { display: flex; }
+    .how-track {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 0;
+    }
+  }
+
+  .how-step {
+    position: relative;
+    flex: 1;
+    padding: 8px 12px 20px;
+    text-align: center;
+  }
+  @media (min-width: 1024px) {
+    .how-step {
+      padding: 0 18px;
+    }
+  }
+
+  .how-num {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: var(--color-brand-500);
+  }
+
+  .how-title {
+    margin: 0.7rem 0 0;
+    font-size: clamp(1.25rem, 2.4vw, 1.5rem);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    color: var(--color-ink);
+  }
+
+  .how-body {
+    margin: 0.75rem auto 0;
+    max-width: 18rem;
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--color-ink-soft);
+  }
+
+  .how-line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-brand-400);
+    flex: none;
+    padding: 4px 0 18px;
+  }
+  .how-line-svg {
+    display: none;
+    width: 56px;
+    height: 24px;
+    overflow: visible;
+  }
+  .how-line-svg--vert {
+    display: block;
+    width: 24px;
+    height: 36px;
+  }
+  @media (min-width: 1024px) {
+    .how-line {
+      padding: 2.1rem 4px 0;
+      align-self: flex-start;
+    }
+    .how-line-svg {
+      display: block;
+      width: 48px;
+      height: 24px;
+    }
+    .how-line-svg--vert {
+      display: none;
+    }
+  }
+
+  .how-line-path {
+    stroke-dasharray: 80;
+    stroke-dashoffset: 80;
+    transition: none;
+  }
+  .how-track.is-drawn .how-line:nth-child(2) .how-line-path {
+    transition: stroke-dashoffset 0.7s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)) 0.2s;
+    stroke-dashoffset: 0;
+  }
+  .how-track.is-drawn .how-line:nth-child(4) .how-line-path {
+    transition: stroke-dashoffset 0.7s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)) 0.45s;
+    stroke-dashoffset: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .how-line-path {
+      stroke-dashoffset: 0 !important;
+      transition: none !important;
+    }
   }
 </style>
+
+<script>
+  function initHowLines() {
+    const track = document.querySelector<HTMLElement>("[data-how-track]");
+    if (!track || track.dataset.bound === "1") return;
+    track.dataset.bound = "1";
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) {
+      track.classList.add("is-drawn");
+      return;
+    }
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        track.classList.add("is-drawn");
+        io.disconnect();
+      },
+      { threshold: 0.35 }
+    );
+    io.observe(track);
+  }
+
+  initHowLines();
+  document.addEventListener("astro:after-swap", () => {
+    const track = document.querySelector<HTMLElement>("[data-how-track]");
+    if (track) delete track.dataset.bound;
+    initHowLines();
+  });
+</script>

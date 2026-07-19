@@ -1,79 +1,96 @@
 ---
 // The main event: a wide, glass, search-bar-style interactive live-quote box.
 // Swappable placeholder — the real embeddable widget mounts at #quoter-widget.
-const presets = ["12 Oakfield Road, Leeds", "4 Elm Grove, Bristol", "27 Hillside Ave, Manchester"];
+const sampleAddress = "12 Oakfield Road, Leeds";
+// Same outline as the satellite section (placeholder until live measure lands)
+const roofPath =
+  "M277 356 L277 408 L277 480 L277 508 L308 512 L335 517 L339 533 L339 544 L411 545 L474 545 L534 545 L571 547 L625 548 L677 548 L724 551 L725 534 L774 526 L789 513 L807 490 L808 450 L794 428 L784 423 L784 387 L783 341 L777 318 L778 287 L778 255 L725 245 L669 241 L616 239 L611 201 L600 200 L601 141 L546 138 L494 140 L482 140 L479 197 L469 207 L467 239 L362 239 L357 324 L341 334 L342 354 L314 357 Z";
 ---
 
 <div class="q" id="quoter-widget" data-stage="input">
   <!-- INPUT -->
   <div data-panel="input" class="q-panel">
     <div class="q-search">
-      <svg class="q-search-icon" width="19" height="19" viewBox="0 0 24 24" fill="none">
+      <label class="q-sr-only" for="quoter-address">Home address</label>
+      <svg class="q-search-icon" width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11Z" stroke="#6b7280" stroke-width="2" stroke-linejoin="round"/>
         <circle cx="12" cy="10" r="2.5" stroke="#6b7280" stroke-width="2"/>
       </svg>
-      <input type="text" data-input placeholder="Enter your address" autocomplete="off" spellcheck="false" aria-label="Your address" />
-      <button type="button" data-go class="q-go">
-        Get free quote
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <input
+        id="quoter-address"
+        type="text"
+        data-input
+        placeholder="Enter your address"
+        autocomplete="street-address"
+        spellcheck="false"
+      />
+      <button type="button" data-go class="q-go" aria-label="Get my free quote">
+        <span class="q-go-full">Get my free quote</span>
+        <span class="q-go-short" aria-hidden="true">Measure</span>
+        <svg class="q-go-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
     </div>
     <div class="q-presets">
-      <span class="q-presets-label">Try:</span>
-      {presets.map((p) => <button type="button" class="q-chip" data-preset={p}>{p.split(",")[0]}</button>)}
+      <button type="button" class="q-sample" data-preset={sampleAddress}>
+        Try a sample address
+      </button>
     </div>
   </div>
 
-  <!-- LOADING -->
+  <!-- LOADING — same footprint as input (ghost presets row keeps height) -->
   <div data-panel="loading" class="q-panel" hidden>
-    <div class="q-map q-map--loading"><div class="q-spinner"></div></div>
-    <div class="q-loading-text">Measuring your roof from satellite…</div>
-    <div class="q-loading-addr" data-loading-addr></div>
+    <div class="q-loading">
+      <div class="q-spinner" aria-hidden="true"></div>
+      <div class="q-loading-copy">
+        <div class="q-loading-text">Measuring your roof from satellite…</div>
+        <div class="q-loading-addr" data-loading-addr></div>
+      </div>
+    </div>
+    <div class="q-presets q-presets--ghost" aria-hidden="true">
+      <span class="q-sample">Try a sample address</span>
+    </div>
   </div>
 
   <!-- RESULT -->
   <div data-panel="result" class="q-panel" hidden>
     <div class="q-addressbar">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-        <path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11Z" stroke="#6b7280" stroke-width="2" stroke-linejoin="round"/>
-        <circle cx="12" cy="10" r="2.5" stroke="#6b7280" stroke-width="2"/>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="2"/>
       </svg>
       <span data-result-addr>12 Oakfield Road, Leeds</span>
-      <span class="q-check">✓</span>
+      <span class="q-check" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M5 12.5l5 5L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
     </div>
 
     <div class="q-grid">
       <div class="q-map">
-        <svg viewBox="0 0 340 210" preserveAspectRatio="xMidYMid slice" class="q-map-svg">
-          <defs>
-            <linearGradient id="qsat" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#eaece7"/>
-              <stop offset="1" stop-color="#d7dcd3"/>
-            </linearGradient>
-          </defs>
-          <rect width="340" height="210" fill="url(#qsat)"/>
-          <rect x="14" y="20" width="70" height="56" rx="3" fill="#cfd4cb"/>
-          <rect x="266" y="24" width="62" height="54" rx="3" fill="#cfd4cb"/>
-          <rect x="20" y="146" width="80" height="48" rx="3" fill="#cfd4cb"/>
-          <rect x="256" y="140" width="78" height="58" rx="3" fill="#cfd4cb"/>
-          <path d="M0 110 H340" stroke="#c5cbbf" stroke-width="14"/>
-          <path d="M120 0 V210" stroke="#c5cbbf" stroke-width="13"/>
-          <polygon class="q-roof-fill" points="140,60 220,60 238,106 122,106"/>
-          <polygon class="q-roof-line" points="140,60 220,60 238,106 122,106"/>
-          <circle class="q-pin" cx="122" cy="106" r="4"/>
-          <circle class="q-pin" cx="238" cy="106" r="4"/>
-          <circle class="q-pin" cx="220" cy="60" r="4"/>
-          <circle class="q-pin" cx="140" cy="60" r="4"/>
+        <img
+          class="q-map-photo"
+          src="/satellite-roof.webp"
+          alt=""
+          width="640"
+          height="480"
+          loading="lazy"
+          decoding="async"
+        />
+        <div class="q-map-vignette" aria-hidden="true"></div>
+        <svg class="q-map-overlay" viewBox="0 0 1024 768" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <path class="q-roof-fill" d={roofPath} />
+          <path class="q-roof-line" d={roofPath} />
         </svg>
         <div class="q-map-badge"><span data-area>92</span>&nbsp;m² measured</div>
       </div>
 
       <div class="q-details">
         <div>
-          <div class="q-result-label">Ballpark estimate</div>
-          <div class="q-result-price" data-price>£6,200&nbsp;–&nbsp;£8,400</div>
+          <div class="q-result-label">Cost estimate</div>
+          <div class="font-display q-result-price" data-price>£6,200 – £8,400</div>
           <div class="q-result-meta" data-meta>≈ 92 m² · concrete tile · full strip &amp; re-roof</div>
         </div>
         <div class="q-actions">
@@ -87,31 +104,198 @@ const presets = ["12 Oakfield Road, Leeds", "4 Elm Grove, Bristol", "27 Hillside
 
 <style>
   .q {
+    --q-m: 0;
     width: 100%;
     text-align: left;
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(30px) saturate(1.8);
-    -webkit-backdrop-filter: blur(30px) saturate(1.8);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 28px;
-    padding: 18px;
+    background: rgba(255, 255, 255, calc(0.5 + var(--q-m) * 0.22));
+    backdrop-filter: blur(calc(30px - var(--q-m) * 8px)) saturate(calc(1.8 - var(--q-m) * 0.2));
+    -webkit-backdrop-filter: blur(calc(30px - var(--q-m) * 8px)) saturate(calc(1.8 - var(--q-m) * 0.2));
+    border: 1px solid rgba(255, 255, 255, calc(0.6 + var(--q-m) * 0.15));
+    border-radius: calc(28px - var(--q-m) * 20px);
+    padding: calc(18px - var(--q-m) * 12px);
     box-shadow:
       0 1px 0 rgba(255, 255, 255, 0.7) inset,
-      0 2px 6px rgba(16, 24, 40, 0.05),
-      0 40px 80px -32px rgba(23, 60, 160, 0.45);
+      0 2px 6px rgba(16, 24, 40, calc(0.05 + var(--q-m) * 0.02)),
+      0 calc(40px - var(--q-m) * 28px) calc(80px - var(--q-m) * 50px) calc(-32px + var(--q-m) * 16px) rgba(23, 60, 160, calc(0.45 - var(--q-m) * 0.1));
+  }
+  /* Merging into the glass nav — drop own chrome so one pill reads as one surface */
+  .q.is-collapsing,
+  .q[data-docked="1"] {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 0;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, calc(0.5 * (1 - var(--q-m))));
+    border-color: rgba(255, 255, 255, calc(0.6 * (1 - var(--q-m))));
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, calc(0.7 * (1 - var(--q-m)))) inset,
+      0 2px 6px rgba(16, 24, 40, calc(0.05 * (1 - var(--q-m)))),
+      0 calc(40px * (1 - var(--q-m))) calc(80px * (1 - var(--q-m))) calc(-32px * (1 - var(--q-m)))
+        rgba(23, 60, 160, calc(0.45 * (1 - var(--q-m))));
+    backdrop-filter: blur(calc(30px * (1 - var(--q-m)))) saturate(calc(1 + 0.8 * (1 - var(--q-m))));
+    -webkit-backdrop-filter: blur(calc(30px * (1 - var(--q-m)))) saturate(calc(1 + 0.8 * (1 - var(--q-m))));
+  }
+  .q[data-docked="1"] {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .q.is-collapsing .q-panel[data-panel="input"],
+  .q[data-docked="1"] .q-panel[data-panel="input"] {
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    animation: none;
+  }
+  .q.is-collapsing .q-presets,
+  .q[data-docked="1"] .q-presets {
+    display: none !important;
+  }
+  .q.is-collapsing .q-search,
+  .q[data-docked="1"] .q-search {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    align-items: center;
+    gap: 8px;
+    padding: 0 0 0 4px;
+    box-sizing: border-box;
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+  /* Docked: keep a clear focus ring on the glass nav trail */
+  .q.is-collapsing .q-search:focus-within,
+  .q[data-docked="1"] .q-search:focus-within {
+    border-color: transparent;
+    box-shadow: 0 0 0 2px rgba(47, 107, 255, 0.55);
+    border-radius: 999px;
+  }
+  .q.is-collapsing .q-search input:focus,
+  .q[data-docked="1"] .q-search input:focus {
+    outline: none;
+  }
+  .q-go:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+  .q.is-collapsing .q-go,
+  .q[data-docked="1"] .q-go {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    margin-left: auto;
+    margin-right: 0;
+    min-height: 40px;
+    height: 40px;
+    padding: 0 18px;
+    border-radius: 999px;
+    gap: 0;
+  }
+  .q.is-collapsing .q-go-full,
+  .q.is-collapsing .q-go-arrow,
+  .q[data-docked="1"] .q-go-full,
+  .q[data-docked="1"] .q-go-arrow {
+    display: none !important;
+  }
+  .q.is-collapsing .q-go-short,
+  .q[data-docked="1"] .q-go-short {
+    display: inline !important;
+    max-width: none;
+    opacity: 1;
+  }
+  .q.is-collapsing .q-search input,
+  .q[data-docked="1"] .q-search input {
+    font-size: 14px;
   }
 
-  .q-panel { animation: q-fade 0.35s cubic-bezier(0.16,1,0.3,1); }
-  @keyframes q-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  /* Input never auto-animates on first paint (dock reparent would flash). */
+  .q-panel[data-panel="input"] { animation: none; }
+  .q-panel[data-panel="loading"]:not([hidden]),
+  .q-panel[data-panel="result"]:not([hidden]) {
+    animation: none; /* driven by .is-opening / .is-closing */
+  }
+  @keyframes q-fade {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: none; }
+  }
 
-  /* search bar */
+  /* Open: card grows, panel rises in */
+  .q.is-opening {
+    overflow: hidden;
+  }
+  .q.is-opening > .q-panel:not([hidden]) {
+    animation: q-open 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes q-open {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Close: open quote folds away, then input soft-reopens */
+  .q.is-closing {
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .q.is-closing > .q-panel:not([hidden]) {
+    animation: q-close 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  @keyframes q-close {
+    to {
+      opacity: 0;
+      transform: translateY(-12px) scale(0.97);
+    }
+  }
+  .q.is-reopen > .q-panel[data-panel="input"]:not([hidden]) {
+    animation: q-fade 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .q.is-height-anim {
+    transition: height 0.36s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Scroll-driven close — progress in --q-close (0→1), no CSS duration */
+  .q.is-scroll-closing {
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .q.is-scroll-closing > .q-panel:not([hidden]) {
+    opacity: calc(1 - var(--q-close, 0) * 1.08);
+    transform: translateY(calc(var(--q-close, 0) * -16px))
+      scale(calc(1 - var(--q-close, 0) * 0.045));
+    will-change: opacity, transform;
+  }
+
+  /* search bar — merges into the outer pill as morph rises */
   .q-search {
-    display: flex; align-items: center; gap: 10px;
-    background: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.9);
-    border-radius: 18px;
-    padding: 8px 8px 8px 15px;
-    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.06), 0 1px 0 rgba(255,255,255,0.9) inset;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: calc(10px - var(--q-m) * 2px);
+    background: rgba(255, 255, 255, calc(0.85 - var(--q-m) * 0.85));
+    border: 1px solid rgba(255, 255, 255, calc(0.9 - var(--q-m) * 0.9));
+    border-radius: calc(18px + var(--q-m) * 981px);
+    padding:
+      calc(8px - var(--q-m) * 8px)
+      calc(8px - var(--q-m) * 8px)
+      calc(8px - var(--q-m) * 8px)
+      calc(15px - var(--q-m) * 3px);
+    box-shadow:
+      0 2px 8px rgba(16, 24, 40, calc(0.06 * (1 - var(--q-m)))),
+      0 1px 0 rgba(255,255,255, calc(0.9 * (1 - var(--q-m)))) inset;
     transition: box-shadow 0.15s ease, border-color 0.15s ease;
   }
   .q-search:focus-within {
@@ -119,46 +303,133 @@ const presets = ["12 Oakfield Road, Leeds", "4 Elm Grove, Bristol", "27 Hillside
     box-shadow: 0 0 0 4px rgba(47,107,255,0.14), 0 2px 8px rgba(16,24,40,0.06);
   }
   .q-search-icon { flex: none; }
+  .q-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
   .q-search input {
     flex: 1; min-width: 0; border: none; outline: none; background: transparent;
     font-size: 16px; color: var(--color-ink); /* 16px avoids iOS zoom */
   }
+  .q-search input:focus-visible {
+    outline: none;
+  }
   .q-go {
     flex: none;
-    display: inline-flex; align-items: center; gap: 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
     background: linear-gradient(180deg, var(--color-brand-500), var(--color-brand-600));
-    color: #fff; font-weight: 600; font-size: 14px;
-    padding: 10px 16px; border-radius: 13px;
+    color: #fff;
+    font-weight: 600;
+    font-size: calc(14px - var(--q-m) * 1px);
+    padding: calc(10px - var(--q-m) * 2px) calc(16px - var(--q-m) * 2px);
+    border-radius: calc(13px + var(--q-m) * 986px);
     box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset, 0 8px 18px -6px rgba(31,87,240,0.55);
-    cursor: pointer; transition: transform 0.16s ease, filter 0.16s ease;
+    cursor: pointer;
+    transition: filter 0.16s ease;
+    overflow: hidden;
   }
-  .q-go:hover { transform: translateY(-1px); filter: brightness(1.05); }
-  .q-go:active { transform: translateY(0); }
+  .q-go:hover { filter: brightness(1.05); }
+  /* Both labels in-flow — widths collapse so the button shrinks and stays right-flush */
+  .q-go-full {
+    display: inline-block;
+    max-width: calc((1 - var(--q-m)) * 13em);
+    opacity: calc(1 - var(--q-m) * 1.25);
+    overflow: hidden;
+    white-space: nowrap;
+    vertical-align: bottom;
+  }
+  .q-go-short {
+    display: inline-block;
+    max-width: calc(var(--q-m) * 5.5em);
+    opacity: calc(var(--q-m) * 1.15);
+    overflow: hidden;
+    white-space: nowrap;
+    vertical-align: bottom;
+  }
+  .q-go-arrow {
+    display: inline-block;
+    max-width: calc((1 - var(--q-m)) * 18px);
+    opacity: calc(1 - var(--q-m) * 1.4);
+    overflow: hidden;
+    margin-left: calc(7px * (1 - var(--q-m)));
+    vertical-align: middle;
+  }
+  .q[data-docked="1"] .q-go-full,
+  .q[data-docked="1"] .q-go-arrow {
+    max-width: 0;
+    opacity: 0;
+    margin: 0;
+  }
+  .q[data-docked="1"] .q-go-short {
+    max-width: 5.5em;
+    opacity: 1;
+  }
 
-  .q-presets { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; padding: 0 4px; }
-  .q-presets-label { font-size: 12.5px; color: var(--color-muted); }
-  .q-chip {
-    font-size: 12.5px; color: var(--color-ink-soft);
-    background: rgba(255,255,255,0.7);
-    border: 1px solid rgba(255,255,255,0.85);
-    border-radius: 999px; padding: 6px 13px;
-    transition: all 0.15s ease; cursor: pointer;
+  .q-presets {
+    display: flex;
+    justify-content: center;
+    margin-top: calc(12px * (1 - var(--q-m)));
+    padding: 0 4px;
+    opacity: calc(1 - var(--q-m) * 1.35);
+    max-height: calc(40px * (1 - var(--q-m)));
+    overflow: hidden;
+    pointer-events: var(--q-preset-pe, auto);
+    transform: translateY(calc(var(--q-m) * -6px));
   }
-  .q-chip:hover { border-color: var(--color-brand-400); color: var(--color-brand-600); background: #fff; }
+  .q-presets--ghost {
+    visibility: hidden;
+    pointer-events: none;
+    opacity: 1; /* keep layout height; visibility hides paint */
+    max-height: 40px;
+    margin-top: 12px;
+    transform: none;
+  }
+  .q-sample {
+    border: 0;
+    background: none;
+    padding: 4px 2px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-ink-soft);
+    text-decoration: underline;
+    text-decoration-color: rgba(47, 107, 255, 0.35);
+    text-underline-offset: 3px;
+    cursor: pointer;
+    transition: color 0.15s ease, text-decoration-color 0.15s ease;
+  }
+  .q-sample:hover {
+    color: var(--color-brand-600);
+    text-decoration-color: rgba(47, 107, 255, 0.7);
+  }
+  .q-sample:focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
 
   @media (max-width: 520px) {
     .q {
-      border-radius: 20px;
-      padding: 12px;
+      border-radius: calc(20px - var(--q-m) * 12px);
+      padding: calc(12px - var(--q-m) * 6px);
       /* Glassier on mobile: more translucent so the blob frosts through */
-      background: rgba(255, 255, 255, 0.38);
+      background: rgba(255, 255, 255, calc(0.38 + var(--q-m) * 0.34));
       backdrop-filter: blur(26px) saturate(1.9);
       -webkit-backdrop-filter: blur(26px) saturate(1.9);
       border-color: rgba(255, 255, 255, 0.55);
     }
     .q-search {
-      background: rgba(255, 255, 255, 0.78);
-      border-color: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, calc(0.78 - var(--q-m) * 0.78));
+      border-color: rgba(255, 255, 255, calc(0.85 - var(--q-m) * 0.85));
     }
     .q-search {
       display: grid;
@@ -171,6 +442,26 @@ const presets = ["12 Oakfield Road, Leeds", "4 Elm Grove, Bristol", "27 Hillside
       padding: 12px;
       border-radius: 16px;
     }
+    /* Collapsing / docked: single-row pill (not the stacked mobile search) */
+    .q.is-collapsing .q-search,
+    .q[data-docked="1"] .q-search {
+      display: flex !important;
+      grid-template-columns: none;
+      grid-template-areas: none;
+      padding: 0 0 0 12px !important;
+      gap: 8px;
+      height: 100%;
+    }
+    .q.is-collapsing .q-go,
+    .q[data-docked="1"] .q-go {
+      width: auto;
+      justify-content: center;
+      margin-left: auto;
+      grid-area: auto;
+    }
+    .q.is-collapsing .q-search-icon { grid-area: auto; }
+    .q.is-collapsing .q-search input { grid-area: auto; width: auto; }
+    .q.is-collapsing .q-go { grid-area: auto; }
     .q-search-icon { grid-area: icon; }
     .q-search input {
       grid-area: input;
@@ -184,97 +475,317 @@ const presets = ["12 Oakfield Road, Leeds", "4 Elm Grove, Bristol", "27 Hillside
       padding: 12px 16px;
       border-radius: 12px;
     }
-    /* Mobile: no preset chips — just the clean search bar */
-    .q-presets { display: none; }
-    .q-result-price { font-size: 26px; }
+    .q-sample { font-size: 12.5px; }
+    .q-result-price { font-size: 1.45rem; }
+    .q-addressbar { border-radius: 18px; }
   }
 
-  /* result */
+  /* result — same glass / type / pill language as the rest of the site */
   .q-addressbar {
-    display: flex; align-items: center; gap: 8px;
-    background: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.9);
-    border-radius: 14px; padding: 11px 14px; margin-bottom: 14px;
-    font-size: 14px; color: #313640;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 999px;
+    padding: 11px 14px 11px 16px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-ink);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset;
   }
-  .q-addressbar span:nth-of-type(1) { flex: 1; }
-  .q-check { color: #12a150; font-weight: 700; }
+  .q-addressbar svg {
+    flex: none;
+    color: var(--color-muted);
+  }
+  .q-addressbar span:nth-of-type(1) {
+    flex: 1;
+    min-width: 0;
+    letter-spacing: -0.015em;
+  }
+  .q-check {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: rgba(47, 107, 255, 0.12);
+    color: var(--color-brand-600);
+  }
 
-  .q-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  .q-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
   @media (min-width: 540px) {
-    .q-grid { grid-template-columns: 1.05fr 1fr; }
+    .q-grid {
+      grid-template-columns: 1fr 1.05fr;
+      gap: 14px;
+      align-items: stretch;
+    }
   }
 
   .q-map {
-    position: relative; border-radius: 16px; overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.6); min-height: 168px;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    /* Cap height so result doesn’t blow up the hero */
+    height: 148px;
+    background: #1a1e16;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset;
   }
-  .q-map-svg { width: 100%; height: 100%; display: block; }
+  @media (min-width: 540px) {
+    .q-map {
+      height: 100%;
+      min-height: 148px;
+      max-height: 168px;
+    }
+  }
+  .q-map-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+  }
+  .q-map-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 58% 52% at 50% 50%,
+      transparent 35%,
+      rgba(8, 12, 24, 0.4) 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+  .q-map-overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+  }
   .q-map-badge {
-    position: absolute; left: 10px; bottom: 10px;
-    background: rgba(10,11,13,0.72); color: #fff;
-    font-size: 11px; font-weight: 600; padding: 4px 9px; border-radius: 8px;
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    z-index: 3;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--color-ink);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    padding: 5px 11px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 10px rgba(16, 24, 40, 0.08);
   }
-  .q-map--loading {
-    display: flex; align-items: center; justify-content: center; min-height: 168px;
-    background: linear-gradient(100deg, #eef0ec 30%, #f6f7f4 50%, #eef0ec 70%) 0 0 / 200% 100%, #eceee9;
-    animation: q-shimmer 1.3s linear infinite; border-radius: 16px;
+
+  .q-loading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 52px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.65) inset;
   }
-  @keyframes q-shimmer { to { background-position: -200% 0, 0 0; } }
   .q-spinner {
-    width: 32px; height: 32px; border-radius: 50%;
-    border: 3px solid rgba(47,107,255,0.2); border-top-color: var(--color-brand-500);
+    flex: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2.5px solid rgba(47, 107, 255, 0.2);
+    border-top-color: var(--color-brand-500);
     animation: q-spin 0.8s linear infinite;
   }
-  @keyframes q-spin { to { transform: rotate(360deg); } }
-  .q-loading-text { text-align: center; margin-top: 14px; font-size: 14px; font-weight: 500; color: var(--color-ink); }
-  .q-loading-addr { text-align: center; margin-top: 3px; font-size: 12.5px; color: var(--color-muted); }
-
-  .q-roof-fill { fill: rgba(47,107,255,0.24); opacity: 0; }
-  .q-roof-line {
-    fill: none; stroke: #2f6bff; stroke-width: 3; stroke-linejoin: round;
-    stroke-dasharray: 400; stroke-dashoffset: 400;
-    filter: drop-shadow(0 1px 3px rgba(47,107,255,0.4));
+  @keyframes q-spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
-  .q-pin { fill: #2f6bff; stroke: #fff; stroke-width: 1.75; opacity: 0; }
-  [data-panel="result"].playing .q-roof-line { animation: q-draw 1.3s cubic-bezier(0.16,1,0.3,1) forwards 0.15s; }
-  [data-panel="result"].playing .q-roof-fill { animation: q-rfill 0.9s ease forwards 1s; }
-  [data-panel="result"].playing .q-pin { animation: q-pin 0.35s ease forwards 1.35s; }
-  @keyframes q-draw { to { stroke-dashoffset: 0; } }
-  @keyframes q-rfill { to { opacity: 1; } }
-  @keyframes q-pin { to { opacity: 1; } }
+  .q-loading-copy {
+    min-width: 0;
+    text-align: left;
+  }
+  .q-loading-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-ink);
+    letter-spacing: -0.015em;
+  }
+  .q-loading-addr {
+    margin-top: 2px;
+    font-size: 12.5px;
+    color: var(--color-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-  .q-details { display: flex; flex-direction: column; justify-content: space-between; gap: 14px; }
-  .q-result-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--color-muted); font-weight: 600; }
-  .q-result-price { font-family: var(--font-serif); font-size: 30px; font-weight: 600; letter-spacing: -0.01em; color: var(--color-ink); margin-top: 4px; }
-  .q-result-meta { font-size: 12.5px; color: var(--color-muted); margin-top: 4px; }
-  .q-actions { display: flex; flex-direction: column; gap: 6px; }
+  .q-roof-fill {
+    fill: rgba(47, 107, 255, 0.28);
+    opacity: 0;
+  }
+  .q-roof-line {
+    fill: none;
+    stroke: #2f6bff;
+    stroke-width: 4;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    stroke-dasharray: 2400;
+    stroke-dashoffset: 2400;
+  }
+  [data-panel="result"].playing .q-roof-line {
+    animation: q-draw 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.15s;
+  }
+  [data-panel="result"].playing .q-roof-fill {
+    animation: q-rfill 0.9s ease forwards 1s;
+  }
+  @keyframes q-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes q-rfill {
+    to {
+      opacity: 1;
+    }
+  }
+
+  .q-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0;
+    min-height: 0;
+  }
+  .q-result-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-brand-600);
+  }
+  .q-result-label::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-brand-500);
+  }
+  .q-result-price {
+    margin-top: 0.35rem;
+    font-size: clamp(1.45rem, 3.4vw, 1.75rem);
+    font-weight: 400;
+    letter-spacing: -0.035em;
+    line-height: 1.1;
+    color: var(--color-ink);
+  }
+  .q-result-meta {
+    margin-top: 0.3rem;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+    color: var(--color-ink-soft);
+  }
+  .q-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
   .q-book {
     width: 100%;
+    border: 0;
+    border-radius: 999px;
+    padding: 0.7rem 1.1rem;
     background: linear-gradient(180deg, var(--color-brand-500), var(--color-brand-600));
-    color: #fff; font-weight: 600; font-size: 14px; padding: 12px; border-radius: 14px;
-    box-shadow: 0 8px 18px -6px rgba(31,87,240,0.5); cursor: pointer;
-    transition: transform 0.16s ease, filter 0.16s ease;
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.28) inset,
+      0 8px 20px -6px rgba(31, 87, 240, 0.5);
+    transition:
+      transform 0.35s var(--ease-out-expo, ease),
+      filter 0.25s ease,
+      box-shadow 0.35s var(--ease-out-expo, ease);
   }
-  .q-book:hover { transform: translateY(-1px); filter: brightness(1.04); }
+  .q-book:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.04);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.32) inset,
+      0 14px 30px -6px rgba(31, 87, 240, 0.58);
+  }
+  .q-book:focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 3px;
+  }
   .q-reset {
-    width: 100%; padding: 8px; font-size: 13px; font-weight: 500; color: var(--color-muted);
-    background: none; border: none; cursor: pointer; transition: color 0.15s ease;
+    width: 100%;
+    padding: 0.45rem;
+    border: 0;
+    background: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--color-ink-soft);
+    text-decoration: underline;
+    text-decoration-color: rgba(47, 107, 255, 0.3);
+    text-underline-offset: 3px;
+    cursor: pointer;
+    transition: color 0.15s ease, text-decoration-color 0.15s ease;
   }
-  .q-reset:hover { color: var(--color-ink); }
+  .q-reset:hover {
+    color: var(--color-brand-600);
+    text-decoration-color: rgba(47, 107, 255, 0.65);
+  }
+  .q-reset:focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
 
   @media (prefers-reduced-motion: reduce) {
     .q-spinner { animation-duration: 1.6s; }
     [data-panel="result"].playing .q-roof-line { animation: none; stroke-dashoffset: 0; }
-    [data-panel="result"].playing .q-roof-fill,
-    [data-panel="result"].playing .q-pin { animation: none; opacity: 1; }
-    .q-map--loading { animation: none; }
+    [data-panel="result"].playing .q-roof-fill { animation: none; opacity: 1; }
+    .q.is-opening > .q-panel:not([hidden]),
+    .q.is-closing > .q-panel:not([hidden]),
+    .q.is-reopen > .q-panel[data-panel="input"]:not([hidden]) {
+      animation: none;
+    }
+    .q.is-height-anim {
+      transition: none;
+    }
   }
 </style>
 
 <script>
   function initQuoter() {
     const card = document.getElementById("quoter-widget");
-    if (!card) return;
+    if (!card || card.dataset.bound === "1") return;
+    card.dataset.bound = "1";
 
     const panels = {
       input: card.querySelector('[data-panel="input"]') as HTMLElement,
@@ -291,13 +802,270 @@ const presets = ["12 Oakfield Road, Leeds", "4 Elm Grove, Bristol", "27 Hillside
     const metaEl = card.querySelector("[data-meta]") as HTMLElement;
 
     const materials = ["concrete tile", "clay tile", "natural slate", "interlocking tile"];
+    let runTimer = 0;
+    let closeTimer = 0;
+    let openTimer = 0;
+    let closing = false;
+    let heightEndHandler: ((e: TransitionEvent) => void) | null = null;
+    let openH = 0;
+    let inputH = 0;
+    // Scroll distance over which an open quote fully collapses into search,
+    // timed to finish as the nav dock morph begins.
+    const CLOSE_RANGE = () => Math.min(200, Math.max(140, window.innerHeight * 0.2));
+    const CLOSE_MS = 300;
+    const OPEN_MS = 380;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const smoothstep = (t: number) => {
+      const u = Math.min(1, Math.max(0, t));
+      return u * u * (3 - 2 * u);
+    };
+
+    function getScrollY() {
+      return (
+        (window as any).__lenis?.scroll ??
+        window.scrollY ??
+        document.documentElement.scrollTop ??
+        0
+      );
+    }
 
     function show(stage: "input" | "loading" | "result") {
       (Object.keys(panels) as Array<keyof typeof panels>).forEach((k) => {
         panels[k].hidden = k !== stage;
       });
       card.dataset.stage = stage;
+      if (stage === "input") {
+        panels.result.classList.remove("playing");
+        delete card.dataset.scrollClose;
+      }
     }
+
+    type CloseOpts = { clear?: boolean; focus?: boolean };
+
+    function clearScrollCloseStyles() {
+      card.classList.remove("is-scroll-closing");
+      delete card.dataset.scrollClose;
+      card.style.removeProperty("--q-close");
+      // Only clear height if we were driving it for scroll-close
+      if (!card.classList.contains("is-height-anim") && !card.classList.contains("is-opening")) {
+        card.style.height = "";
+        card.style.overflow = "";
+      }
+    }
+
+    function clearMotionState() {
+      window.clearTimeout(closeTimer);
+      window.clearTimeout(openTimer);
+      closeTimer = 0;
+      openTimer = 0;
+      closing = false;
+      if (heightEndHandler) {
+        card.removeEventListener("transitionend", heightEndHandler);
+        heightEndHandler = null;
+      }
+      clearScrollCloseStyles();
+      card.classList.remove("is-closing", "is-opening", "is-reopen", "is-height-anim");
+      card.style.height = "";
+      card.style.transition = "";
+      card.style.overflow = "";
+    }
+
+    function openStage(stage: "loading" | "result") {
+      clearMotionState();
+
+      if (reduceMotion || getScrollY() >= CLOSE_RANGE() * 0.55) {
+        show(stage);
+        requestAnimationFrame(() => {
+          openH = card.offsetHeight;
+        });
+        return;
+      }
+
+      const fromH = card.offsetHeight;
+      if ((card.dataset.stage || "input") === "input") inputH = fromH;
+      show(stage);
+      card.style.height = "auto";
+      const toH = card.offsetHeight;
+      openH = toH;
+
+      const endOpen = () => {
+        card.classList.remove("is-opening", "is-height-anim");
+        card.style.height = "";
+        if (heightEndHandler) {
+          card.removeEventListener("transitionend", heightEndHandler);
+          heightEndHandler = null;
+        }
+        window.clearTimeout(openTimer);
+        openTimer = 0;
+        openH = card.offsetHeight || toH;
+      };
+
+      if (Math.abs(toH - fromH) < 6) {
+        card.style.height = "";
+        card.classList.add("is-opening");
+        void panels[stage].offsetWidth;
+        openTimer = window.setTimeout(endOpen, OPEN_MS + 40);
+        return;
+      }
+
+      card.style.height = `${fromH}px`;
+      void card.offsetHeight;
+      card.classList.add("is-opening", "is-height-anim");
+      heightEndHandler = (e: TransitionEvent) => {
+        if (e.propertyName !== "height") return;
+        endOpen();
+      };
+      card.addEventListener("transitionend", heightEndHandler);
+      requestAnimationFrame(() => {
+        card.style.height = `${toH}px`;
+      });
+      openTimer = window.setTimeout(endOpen, OPEN_MS + 80);
+    }
+
+    function finishClose(opts: CloseOpts = {}) {
+      const fromH = card.offsetHeight;
+      const animateHeight = !reduceMotion && getScrollY() < 24;
+
+      clearScrollCloseStyles();
+      card.classList.remove("is-closing");
+      if (opts.clear) input.value = "";
+      show("input");
+
+      if (animateHeight && fromH > 0) {
+        card.style.height = "auto";
+        const toH = card.offsetHeight;
+        inputH = toH;
+        card.style.height = `${fromH}px`;
+        void card.offsetHeight;
+        card.classList.add("is-height-anim", "is-reopen");
+        requestAnimationFrame(() => {
+          card.style.height = `${toH}px`;
+        });
+        const endHeight = () => {
+          card.classList.remove("is-height-anim");
+          card.style.height = "";
+          card.removeEventListener("transitionend", onHeightEnd);
+        };
+        const onHeightEnd = (e: TransitionEvent) => {
+          if (e.propertyName !== "height") return;
+          endHeight();
+        };
+        card.addEventListener("transitionend", onHeightEnd);
+        window.setTimeout(endHeight, 420);
+      } else {
+        card.classList.add("is-reopen");
+        inputH = card.offsetHeight;
+      }
+
+      closing = false;
+      closeTimer = 0;
+
+      window.setTimeout(() => card.classList.remove("is-reopen"), 400);
+      if (opts.focus) input.focus();
+    }
+
+    function dismissOpenCard(opts: CloseOpts = {}) {
+      const stage = card.dataset.stage || "input";
+      if (stage === "input" || closing) return;
+
+      window.clearTimeout(runTimer);
+      window.clearTimeout(openTimer);
+      runTimer = 0;
+      openTimer = 0;
+      if (heightEndHandler) {
+        card.removeEventListener("transitionend", heightEndHandler);
+        heightEndHandler = null;
+      }
+      clearScrollCloseStyles();
+      card.classList.remove("is-opening", "is-reopen", "is-height-anim");
+      card.style.height = "";
+
+      if (reduceMotion) {
+        if (opts.clear) input.value = "";
+        show("input");
+        if (opts.focus) input.focus();
+        return;
+      }
+
+      const active = stage === "loading" ? panels.loading : panels.result;
+      closing = true;
+      card.classList.add("is-closing");
+
+      const done = () => {
+        active.removeEventListener("animationend", onEnd);
+        window.clearTimeout(closeTimer);
+        finishClose(opts);
+      };
+      const onEnd = (e: AnimationEvent) => {
+        if (e.target !== active) return;
+        if (e.animationName !== "q-close") return;
+        done();
+      };
+      active.addEventListener("animationend", onEnd);
+      closeTimer = window.setTimeout(done, CLOSE_MS + 80);
+    }
+
+    function commitScrollClose() {
+      window.clearTimeout(runTimer);
+      runTimer = 0;
+      card.classList.remove("is-scroll-closing", "is-opening", "is-height-anim");
+      card.style.height = "";
+      card.style.overflow = "";
+      card.style.removeProperty("--q-close");
+      delete card.dataset.scrollClose;
+      show("input");
+    }
+
+    function onScrollClose() {
+      if (closing) return;
+      const stage = card.dataset.stage || "input";
+      if (stage === "input") return;
+
+      const range = CLOSE_RANGE();
+      const y = getScrollY();
+      const t = smoothstep(y / range);
+
+      if (reduceMotion) {
+        if (y >= range * 0.5) commitScrollClose();
+        return;
+      }
+
+      // Cancel in-flight quote / open anim once the user is clearly leaving
+      if (t > 0.08) {
+        window.clearTimeout(runTimer);
+        runTimer = 0;
+        if (card.classList.contains("is-opening") || card.classList.contains("is-height-anim")) {
+          if (!openH) openH = card.offsetHeight;
+          window.clearTimeout(openTimer);
+          openTimer = 0;
+          if (heightEndHandler) {
+            card.removeEventListener("transitionend", heightEndHandler);
+            heightEndHandler = null;
+          }
+          card.classList.remove("is-opening", "is-height-anim");
+        }
+      }
+
+      if (t <= 0.001) {
+        clearScrollCloseStyles();
+        return;
+      }
+
+      const from = openH || card.offsetHeight;
+      const to = inputH || Math.min(from, 128);
+
+      if (t >= 0.995) {
+        commitScrollClose();
+        return;
+      }
+
+      card.classList.add("is-scroll-closing");
+      card.dataset.scrollClose = "1";
+      card.style.setProperty("--q-close", t.toFixed(4));
+      card.style.height = `${Math.round(from + (to - from) * t)}px`;
+      card.style.overflow = "hidden";
+    }
+
     function hash(str: string) {
       let h = 0;
       for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
@@ -312,32 +1080,43 @@ const presets = ["12 Oakfield Road, Leeds", "4 Elm Grove, Bristol", "27 Hillside
       return { area, material: materials[h % materials.length], low: area * 70, high: area * 95 };
     }
 
-    // Scroll down just enough to reveal the box if it now overflows the viewport.
+    // Only auto-scroll when already past the hero. Nudging scroll at the top
+    // mid-morphs Quoter over the headline.
     function revealCard() {
       requestAnimationFrame(() => {
+        const y = getScrollY();
+        if (y < 160) return;
         const overflow = card.getBoundingClientRect().bottom - window.innerHeight;
-        if (overflow > -16) {
-          const lenis = (window as any).__lenis;
-          const delta = overflow + 28;
-          if (lenis) lenis.scrollTo(window.scrollY + delta);
-          else window.scrollBy({ top: delta, behavior: "smooth" });
-        }
+        if (overflow <= -16) return;
+        const delta = overflow + 28;
+        const lenis = (window as any).__lenis;
+        if (lenis?.scrollTo) lenis.scrollTo(y + delta, { duration: 0.85 });
+        else window.scrollBy({ top: delta, behavior: "smooth" });
       });
     }
 
     function run() {
       const address = input.value.trim();
       if (!address) { input.focus(); return; }
+      // Don’t open a quote mid-scroll — dock should own that territory
+      if (getScrollY() >= CLOSE_RANGE() * 0.55) return;
+      if (closing) clearMotionState();
+      window.clearTimeout(runTimer);
       loadingAddr.textContent = address;
-      show("loading");
+      openStage("loading");
       revealCard();
-      window.setTimeout(() => {
+      runTimer = window.setTimeout(() => {
+        runTimer = 0;
+        if (getScrollY() >= CLOSE_RANGE() * 0.55 || closing) {
+          if (!closing) show("input");
+          return;
+        }
         const q = quote(address);
         resultAddr.textContent = address;
         areaEl.textContent = String(q.area);
         priceEl.innerHTML = fmt(q.low) + " – " + fmt(q.high);
         metaEl.textContent = `≈ ${q.area} m² · ${q.material} · full strip & re-roof`;
-        show("result");
+        openStage("result");
         panels.result.classList.remove("playing");
         void panels.result.offsetWidth;
         panels.result.classList.add("playing");
@@ -347,19 +1126,46 @@ const presets = ["12 Oakfield Road, Leeds", "4 Elm Grove, Bristol", "27 Hillside
 
     goBtn.addEventListener("click", run);
     input.addEventListener("keydown", (e) => { if (e.key === "Enter") run(); });
-    card.querySelectorAll("[data-preset]").forEach((chip) => {
-      chip.addEventListener("click", () => {
-        input.value = (chip as HTMLElement).dataset.preset || "";
+    card.querySelectorAll("[data-preset]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        input.value = (btn as HTMLElement).dataset.preset || "";
         run();
       });
     });
     resetBtn.addEventListener("click", () => {
-      input.value = "";
-      show("input");
-      input.focus();
+      dismissOpenCard({ clear: true, focus: true });
     });
+
+    // Capture search footprint once settled
+    requestAnimationFrame(() => {
+      if ((card.dataset.stage || "input") === "input") inputH = card.offsetHeight;
+    });
+
+    window.addEventListener("scroll", onScrollClose, { passive: true });
+    const bindLenisClose = () => {
+      const lenis = (window as any).__lenis;
+      if (!lenis?.on || (card as any).__scrollCloseLenis) return;
+      (card as any).__scrollCloseLenis = true;
+      lenis.on("scroll", onScrollClose);
+    };
+    bindLenisClose();
+    const lenisCloseTimer = window.setInterval(() => {
+      bindLenisClose();
+      if ((card as any).__scrollCloseLenis) window.clearInterval(lenisCloseTimer);
+    }, 100);
+    window.setTimeout(() => window.clearInterval(lenisCloseTimer), 2000);
+
+    // Sticky dock / external triggers
+    window.addEventListener("quoter:run", ((e: CustomEvent<{ address?: string }>) => {
+      if (e.detail?.address) input.value = e.detail.address;
+      run();
+    }) as EventListener);
   }
 
   initQuoter();
-  document.addEventListener("astro:after-swap", initQuoter);
+  document.addEventListener("astro:after-swap", () => {
+    const card = document.getElementById("quoter-widget");
+    if (card) delete card.dataset.bound;
+    initQuoter();
+  });
 </script>

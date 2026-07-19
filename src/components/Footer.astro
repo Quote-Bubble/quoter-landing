@@ -2,32 +2,23 @@
 const year = new Date().getFullYear();
 ---
 
-<!-- final CTA -->
-<section class="cv-auto relative mx-auto max-w-3xl px-4 pt-6 pb-16 text-center sm:px-6 sm:pt-8 sm:pb-20" data-reveal="scale">
-  <h2 class="font-display text-[clamp(1.7rem,6vw,2.8rem)] leading-[1.06] text-ink">
-    Find out what your roof will cost.
-  </h2>
-  <p class="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-ink-soft sm:text-[16px]">
-    Type in your address and you will have a free estimate in seconds. You
-    do not need to give any other details.
-  </p>
-  <button
-    type="button"
-    data-try
-    class="btn-primary mt-7 inline-flex w-full max-w-xs items-center justify-center gap-2 rounded-full px-7 py-3.5 text-[15px] font-semibold sm:mt-8 sm:w-auto"
-  >
-    Get my free quote
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<!-- Sharp closer: sends people back to the address field -->
+<section
+  class="footer-cta cv-auto relative mx-auto max-w-3xl px-4 pt-6 pb-14 text-center sm:px-6 sm:pt-8 sm:pb-16"
+  data-reveal="scale"
+>
+  <p class="footer-cta-line font-display">Ready?</p>
+  <button type="button" data-try class="footer-cta-link">
+    Enter your address above
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 19V5M5 12l7-7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </button>
 </section>
 
-<!-- giant-brand footer: the wordmark stands alone over the deepening blue,
-     with the legal strip sitting cleanly beneath it -->
 <footer class="footer-giant relative">
-  <div data-reveal="fade">
-    <div class="giant-word" aria-hidden="true">QUOTER</div>
+  <div class="giant-wrap" data-reveal="brand-echo">
+    <div class="giant-word" aria-hidden="true">Quoter</div>
   </div>
 
   <div class="footer-legal">
@@ -38,6 +29,39 @@ const year = new Date().getFullYear();
 </footer>
 
 <style>
+  .footer-cta-line {
+    margin: 0;
+    font-size: clamp(1.6rem, 4.5vw, 2.35rem);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1.1;
+    color: var(--color-ink);
+  }
+
+  .footer-cta-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.85rem;
+    padding: 0.35rem 0.25rem;
+    border: 0;
+    background: none;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--color-brand-600);
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.2s var(--ease-out-soft, ease);
+  }
+  .footer-cta-link:hover {
+    color: var(--color-brand-700);
+  }
+  .footer-cta-link:focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 4px;
+    border-radius: 6px;
+  }
+
   .footer-giant {
     overflow: hidden;
     background: linear-gradient(
@@ -50,22 +74,27 @@ const year = new Date().getFullYear();
     );
   }
 
+  .giant-wrap {
+    display: flex;
+    justify-content: center;
+    padding-inline: 0.5rem;
+  }
+
   .giant-word {
     margin-top: clamp(1.25rem, 4vw, 3rem);
-    font-family: var(--font-sans);
-    font-weight: 830;
-    font-size: clamp(3.4rem, 18.5vw, 21rem);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(3.6rem, 19vw, 22rem);
     line-height: 0.9;
     letter-spacing: -0.045em;
     text-align: center;
     white-space: nowrap;
     color: #ffffff;
-    opacity: 0.85;
+    opacity: 0.88;
     user-select: none;
     pointer-events: none;
   }
 
-  /* Legal strip: sits cleanly beneath the wordmark and closes the page */
   .footer-legal {
     position: relative;
     z-index: 5;

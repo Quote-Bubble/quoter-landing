@@ -9,7 +9,7 @@ interface Props {
 
 const {
   title = "Quoter: See your roof price in seconds",
-  description = "Enter your address and get a free ballpark price for your roof, measured by satellite in seconds. No ladders, no sales visit, no obligation. A trusted local roofer confirms every quote.",
+  description = "Enter your address and get a free roof cost estimate from satellite imagery in seconds. No ladders, no sales visit, no obligation. A local roofer can confirm the exact price if you want to go ahead.",
 } = Astro.props;
 ---
 
@@ -28,6 +28,20 @@ const {
     <meta name="theme-color" content="#ffffff" />
     <!-- The blob is the page visual anchor: fetch it before the CSS asks -->
     <link rel="preload" as="image" href="/bg-v3.webp" fetchpriority="high" />
+    <!--
+      Kill scroll restoration before first paint. Otherwise refresh-on-hero
+      restores a few px (or animates there) while fonts/morph shift layout.
+    -->
+    <script is:inline>
+      try {
+        if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+      } catch (_) {}
+      if (!location.hash) {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+      }
+    </script>
   </head>
   <body>
     <div class="site-bg" aria-hidden="true"></div>
@@ -56,6 +70,13 @@ const {
     }
   }
 
+  function pinTop() {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    window.__lenis?.scrollTo(0, { immediate: true, force: true });
+  }
+
   function initLenis() {
     if (window.__lenis) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -81,9 +102,60 @@ const {
         lenis.scrollTo(target as HTMLElement, { offset: -24 });
       });
     });
+
+    // Fresh loads should start at top; Lenis can inherit a restored offset
+    if (!location.hash) pinTop();
   }
+
+  // Hold the top through hero entrance layout shifts unless the user scrolls.
+  function holdHeroTop() {
+    if (location.hash) return;
+
+    let userScrolled = false;
+    const mark = () => {
+      userScrolled = true;
+    };
+    window.addEventListener("wheel", mark, { passive: true, once: true });
+    window.addEventListener("touchmove", mark, { passive: true, once: true });
+    window.addEventListener("keydown", (e) => {
+      if (
+        e.key === "ArrowDown" ||
+        e.key === "ArrowUp" ||
+        e.key === "PageDown" ||
+        e.key === "PageUp" ||
+        e.key === " " ||
+        e.key === "Home" ||
+        e.key === "End"
+      ) {
+        mark();
+      }
+    }, { passive: true, once: true });
+
+    pinTop();
+
+    const started = performance.now();
+    const tick = () => {
+      if (!userScrolled && !location.hash && window.scrollY > 0) pinTop();
+      if (performance.now() - started < 3200) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+
+    window.addEventListener(
+      "pageshow",
+      (e) => {
+        // bfcache restore can bring back a mid-scroll Lenis state
+        if (e.persisted && !location.hash) pinTop();
+      },
+      { passive: true }
+    );
+  }
+
   initLenis();
-  document.addEventListener("astro:after-swap", initLenis);
+  holdHeroTop();
+  document.addEventListener("astro:after-swap", () => {
+    initLenis();
+    holdHeroTop();
+  });
 </script>
 
 <script>
