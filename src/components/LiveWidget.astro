@@ -27,6 +27,7 @@ const EMBED_SRC =
   /* No card chrome here — the widget brings its own glass card inside the
      iframe. This element is just the morph target and sizing host. */
   .q {
+    position: relative;
     width: 100%;
   }
   .q iframe {
@@ -35,6 +36,15 @@ const EMBED_SRC =
     height: 0; /* driven by the embed's postMessage */
     border: 0;
     background: transparent;
+  }
+  /* Suggestions open: the iframe grows but floats ON TOP of the content
+     below (Book a call, scroll cue) instead of pushing it — the host keeps
+     the search bar's footprint so nothing shifts. */
+  .q.is-suggesting iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 60;
   }
   /* Mobile flow needs the whole screen; the embed asks for overlay and we
      pin the iframe to the viewport. */
@@ -57,18 +67,40 @@ const EMBED_SRC =
     ) as HTMLIFrameElement | null;
     if (!frame) return;
 
+    // The search bar's own height, so we can hold its footprint while the
+    // grown iframe floats over the page during suggestions.
+    let baseHeight = 0;
+
     window.addEventListener("message", (e: MessageEvent) => {
       const d = e.data;
       if (!d || d.source !== "quoter-embed") return;
-      // Mirror stage so #quoter-widget[data-stage] selectors + the nav
-      // dock-morph behave exactly as they did with the mock.
+      // Mirror stage so #quoter-widget[data-stage] selectors keep working.
       if (typeof d.stage === "string") holder.dataset.stage = d.stage;
+
+      const h = typeof d.height === "number" && d.height > 0 ? d.height : 0;
+
       if (d.overlay) {
+        // Mobile flow — full-screen the iframe.
         holder.classList.add("is-overlay");
-      } else {
+        holder.classList.remove("is-suggesting");
+        document.documentElement.classList.remove("quoter-suggesting");
+      } else if (d.dropdown) {
+        // Suggestions open — float the iframe over the page, hold the
+        // search bar's footprint, and hide Book-a-call while typing.
         holder.classList.remove("is-overlay");
-        if (typeof d.height === "number" && d.height > 0) {
-          frame.style.height = `${d.height}px`;
+        holder.classList.add("is-suggesting");
+        document.documentElement.classList.add("quoter-suggesting");
+        if (baseHeight) holder.style.height = `${baseHeight}px`;
+        if (h) frame.style.height = `${h}px`;
+      } else {
+        // Normal: iframe sits in flow at its content height.
+        holder.classList.remove("is-overlay");
+        holder.classList.remove("is-suggesting");
+        document.documentElement.classList.remove("quoter-suggesting");
+        holder.style.height = "";
+        if (h) {
+          frame.style.height = `${h}px`;
+          if (d.stage === "input") baseHeight = h; // remember the bar height
         }
       }
     });

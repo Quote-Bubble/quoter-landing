@@ -556,3 +556,13 @@ html.is-widget-morph-ready #quoter-widget {
     animation: none !important;
   }
 }
+
+/* While the embedded widget's address suggestions are open, hide the
+   "Book a call" button so the dropdown (which floats over the page from the
+   iframe) has a clean area and nothing punches through it. */
+html.quoter-suggesting .hero-meeting-takeoff,
+html.quoter-suggesting .meeting-fly {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.15s ease;
+}
