@@ -2,31 +2,35 @@
 const steps = [
   {
     n: "01",
-    title: "We put Quoter on your website",
-    body: "We add a simple quote box to your site — free. Takes a few minutes, and you don’t need to do anything technical.",
+    title: "We put Quoter on your site",
+    body: "We put our quote box on your site. It takes a few minutes and requires nothing technical from you.",
   },
   {
     n: "02",
-    title: "Customer types an address",
-    body: "They put in where they live. Quoter measures the roof from a satellite photo in a few seconds.",
+    title: "Customers request quotes",
+    body: "They put in where they live and what job they want, mark out the relevant areas, and answer questions where necessary. We price the quote exactly like you would.",
   },
   {
     n: "03",
-    title: "They see a price — you get the call",
-    body: "They see what the job might cost and can ask you to come round. You don’t need to drive out first.",
+    title: "You receive the quote",
+    body: "You receive their quote in our dashboard immediately, alongside all the others.",
+  },
+  {
+    n: "04",
+    title: "You pick the best leads",
+    body: "You can pick out the quotes you want to manually verify, complete with estimated price, phone number, and postcode.",
   },
 ];
 ---
 
 <section id="how" class="cv-auto relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-28">
-  <div class="mx-auto max-w-2xl text-center" data-reveal>
-    <span class="section-label">How it works</span>
-    <h2 class="font-display mt-4 text-[clamp(1.85rem,6vw,3.1rem)] leading-[1.05] text-ink">
-      Three simple steps.
+  <div class="mx-auto max-w-4xl text-center" data-reveal>
+    <h2 class="font-display how-heading text-ink">
+      We'll do it all for you
+      <span class="how-heading-line2">
+        <span class="how-heading-accent">for free</span>.
+      </span>
     </h2>
-    <p class="mx-auto mt-4 max-w-lg text-[16px] leading-relaxed text-ink-soft sm:text-[18px]">
-      Try the box above — that is what your customers see on your site.
-    </p>
   </div>
 
   <div class="how-track mt-12 sm:mt-20" data-how-track>
@@ -67,6 +71,49 @@ const steps = [
 </section>
 
 <style>
+  .how-heading {
+    margin: 0;
+    font-size: clamp(1.55rem, 4vw, 2.5rem);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+  }
+  .how-heading-line2 {
+    display: block;
+  }
+  .how-heading-accent {
+    position: relative;
+    display: inline-block;
+    color: var(--color-brand-500);
+  }
+  .how-heading-accent::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.08em;
+    height: 0.07em;
+    border-radius: 999px;
+    background: var(--color-brand-500);
+    transform-origin: left center;
+    transform: scaleX(0);
+    transition: transform 0.6s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)) 0.35s;
+  }
+  [data-reveal].is-in .how-heading-accent::after {
+    transform: scaleX(1);
+  }
+  @media (max-width: 640px) {
+    .how-heading {
+      font-size: clamp(1.4rem, 6.2vw, 1.9rem);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .how-heading-accent::after {
+      transition: none;
+      transform: scaleX(1);
+    }
+  }
+
   .how-track {
     display: flex;
     flex-direction: column;
@@ -164,6 +211,10 @@ const steps = [
   }
   .how-track.is-drawn .how-line:nth-child(4) .how-line-path {
     transition: stroke-dashoffset 0.7s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)) 0.45s;
+    stroke-dashoffset: 0;
+  }
+  .how-track.is-drawn .how-line:nth-child(6) .how-line-path {
+    transition: stroke-dashoffset 0.7s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)) 0.7s;
     stroke-dashoffset: 0;
   }
 
