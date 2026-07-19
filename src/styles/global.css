@@ -369,6 +369,7 @@ input {
   0.00–0.85s   atmosphere / brand presence
   0.58–1.50s   subtitle rises
   1.20–2.40s   widget lifts in
+  1.70–2.65s   book-a-call follows the widget
 */
 .sub-load {
   opacity: 0;
@@ -405,6 +406,19 @@ input {
     opacity: 1;
     transform: translate3d(0, 0, 0) scale(1);
   }
+}
+
+/* Same rise language as the widget — delayed so it lands as a follow-through */
+.meeting-load {
+  opacity: 0;
+  transform: translate3d(0, 36px, 0) scale(0.96);
+  transform-origin: center top;
+  animation: widget-rise 0.95s var(--ease-out-expo) 1.7s forwards;
+}
+.meeting-load.is-settled {
+  animation: none;
+  opacity: 1;
+  transform: none;
 }
 
 /* Widget dock morph: live on document.body so it stacks above page sections */
@@ -518,6 +532,7 @@ html.is-widget-morph-ready #quoter-widget {
   .sub-load,
   .cta-load > *,
   .widget-load,
+  .meeting-load,
   .sub-load,
   .site-bg,
   .site-dots {

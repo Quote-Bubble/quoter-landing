@@ -1,9 +1,13 @@
 ---
 import LiveWidget from "./LiveWidget.astro";
+
+// Keep in sync with Nav.astro meetingUrl
+const meetingUrl = "https://cal.com/";
 ---
 
 <!--
   Widget-first hero. Brand spacer is layout-only; Nav owns the visible flying wordmark.
+  Meeting CTA spacer is layout-only; Nav owns the flying “Book a call” button.
 -->
 <section class="hero relative flex min-h-[100svh] flex-col">
   <div
@@ -25,6 +29,24 @@ import LiveWidget from "./LiveWidget.astro";
         <div class="hero-widget-spacer" data-widget-spacer aria-hidden="true"></div>
         <LiveWidget />
       </div>
+
+      <!--
+        Takeoff button: clickable in-flow until the Nav flyer morphs in,
+        then hidden (same handoff pattern as the Quoter wordmark).
+      -->
+      <a
+        href={meetingUrl}
+        class="hero-meeting-takeoff meeting-load"
+        data-meeting-spacer
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="3" y="5" width="18" height="16" rx="2.5" stroke="currentColor" stroke-width="2"/>
+          <path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Book a call
+      </a>
     </div>
   </div>
 
@@ -58,8 +80,9 @@ import LiveWidget from "./LiveWidget.astro";
     line-height: 0.92;
   }
 
-  /* In-flow wordmark — dramatic resolve, then soft shimmer */
+  /* Solid wordmark + sheen overlay that sweeps through (letters stay put) */
   .hero-brand-spacer {
+    position: relative;
     display: inline-block;
     font-size: clamp(4.25rem, 14vw, 8.5rem);
     font-weight: 600;
@@ -67,27 +90,39 @@ import LiveWidget from "./LiveWidget.astro";
     line-height: 0.92;
     user-select: none;
     pointer-events: none;
-    background-image: linear-gradient(
-      105deg,
-      #0a0b0d 0%,
-      #0a0b0d 38%,
-      #6e9bff 50%,
-      #0a0b0d 62%,
-      #0a0b0d 100%
-    );
-    background-size: 220% 100%;
-    background-position: 100% 50%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    -webkit-text-fill-color: transparent;
+    color: var(--color-ink);
     opacity: 0;
     transform: translateY(0.4em) scale(1.55);
     filter: blur(14px);
     transform-origin: 50% 100%;
-    animation:
-      brand-enter 1.2s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)) 0.18s forwards,
-      brand-shimmer 6s var(--ease-out-soft, ease-in-out) 1.5s infinite;
+    animation: brand-enter 1.2s var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)) 0.18s forwards;
+  }
+  .hero-brand-spacer::after {
+    content: "Quoter";
+    position: absolute;
+    left: 0;
+    top: 0;
+    font: inherit;
+    letter-spacing: inherit;
+    line-height: inherit;
+    white-space: nowrap;
+    pointer-events: none;
+    background-image: linear-gradient(
+      105deg,
+      transparent 0%,
+      transparent 42%,
+      rgba(91, 140, 255, 0.9) 50%,
+      transparent 58%,
+      transparent 100%
+    );
+    background-size: 220% 100%;
+    background-repeat: no-repeat;
+    background-position: 200% 50%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation: brand-sheen 9s linear 1.4s infinite;
   }
   /* Hidden only after the fixed wordmark is placed — no mid-scroll handoff */
   :global(html.is-brand-morphing) .hero-brand-spacer {
@@ -105,14 +140,15 @@ import LiveWidget from "./LiveWidget.astro";
       filter: blur(0);
     }
   }
-  @keyframes brand-shimmer {
-    0%,
-    55% {
-      background-position: 100% 50%;
+  @keyframes brand-sheen {
+    0% {
+      background-position: 200% 50%;
     }
-    75%,
+    32% {
+      background-position: -200% 50%;
+    }
     100% {
-      background-position: 0% 50%;
+      background-position: -200% 50%;
     }
   }
 
@@ -122,9 +158,11 @@ import LiveWidget from "./LiveWidget.astro";
       opacity: 1;
       transform: none;
       filter: none;
-      background: none;
       color: var(--color-ink);
-      -webkit-text-fill-color: var(--color-ink);
+    }
+    .hero-brand-spacer::after {
+      content: none;
+      animation: none;
     }
   }
 
@@ -157,6 +195,54 @@ import LiveWidget from "./LiveWidget.astro";
     pointer-events: none;
     visibility: hidden;
   }
+
+  /* Soft-rect sibling of the quote shell — same brand blue as Get my quote */
+  .hero-meeting-takeoff {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    width: min(100%, 620px);
+    margin: 0.75rem auto 0;
+    padding: 0.8rem 1.05rem;
+    border-radius: 28px;
+    border: 0;
+    background: linear-gradient(180deg, var(--color-brand-500), var(--color-brand-600));
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: #fff;
+    text-decoration: none;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.28) inset,
+      0 8px 20px -8px rgba(31, 87, 240, 0.5);
+    box-sizing: border-box;
+    transition:
+      filter 0.25s ease,
+      transform 0.35s var(--ease-out-expo, ease),
+      box-shadow 0.35s var(--ease-out-expo, ease);
+  }
+  .hero-meeting-takeoff:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.32) inset,
+      0 12px 28px -8px rgba(31, 87, 240, 0.58);
+  }
+  .hero-meeting-takeoff:focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 3px;
+  }
+  .hero-meeting-takeoff svg {
+    flex: none;
+  }
+  /* Hidden once the fixed flyer is placed — no mid-scroll handoff flash */
+  :global(html.is-meeting-morphing) .hero-meeting-takeoff {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
   /* Once morph boots, the real widget is fixed — spacer is the in-flow box */
   /* Pinned to body by JS — keep styles global so portal still looks right */
 
@@ -323,6 +409,19 @@ import LiveWidget from "./LiveWidget.astro";
     shell.addEventListener("animationend", done);
   }
 
+  function settleMeetingLoad() {
+    const btn = document.querySelector<HTMLElement>("[data-meeting-spacer]");
+    if (!btn || btn.dataset.settleBound === "1") return;
+    btn.dataset.settleBound = "1";
+    const done = (e: AnimationEvent) => {
+      if (e.target !== btn) return;
+      if (e.animationName !== "widget-rise") return;
+      btn.classList.add("is-settled");
+      btn.removeEventListener("animationend", done);
+    };
+    btn.addEventListener("animationend", done);
+  }
+
   function initHeroScrollCue() {
     const cue = document.querySelector<HTMLElement>("[data-hero-scroll]");
     if (!cue || cue.dataset.bound === "1") return;
@@ -371,10 +470,12 @@ import LiveWidget from "./LiveWidget.astro";
 
   initTryCta();
   settleWidgetLoad();
+  settleMeetingLoad();
   initHeroScrollCue();
   document.addEventListener("astro:after-swap", () => {
     initTryCta();
     settleWidgetLoad();
+    settleMeetingLoad();
     const cue = document.querySelector<HTMLElement>("[data-hero-scroll]");
     if (cue) delete cue.dataset.bound;
     initHeroScrollCue();

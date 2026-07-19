@@ -1,7 +1,6 @@
 ---
 // The main event: a wide, glass, search-bar-style interactive live-quote box.
 // Swappable placeholder — the real embeddable widget mounts at #quoter-widget.
-const sampleAddress = "12 Oakfield Road, Leeds";
 // Same outline as the satellite section (placeholder until live measure lands)
 const roofPath =
   "M277 356 L277 408 L277 480 L277 508 L308 512 L335 517 L339 533 L339 544 L411 545 L474 545 L534 545 L571 547 L625 548 L677 548 L724 551 L725 534 L774 526 L789 513 L807 490 L808 450 L794 428 L784 423 L784 387 L783 341 L777 318 L778 287 L778 255 L725 245 L669 241 L616 239 L611 201 L600 200 L601 141 L546 138 L494 140 L482 140 L479 197 L469 207 L467 239 L362 239 L357 324 L341 334 L342 354 L314 357 Z";
@@ -25,21 +24,15 @@ const roofPath =
         spellcheck="false"
       />
       <button type="button" data-go class="q-go" aria-label="Get my quote">
-        <span class="q-go-full">Get my quote</span>
-        <span class="q-go-short" aria-hidden="true">Quote</span>
+        <span class="q-go-label">Get my quote</span>
         <svg class="q-go-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
     </div>
-    <div class="q-presets">
-      <button type="button" class="q-sample" data-preset={sampleAddress}>
-        Try it free
-      </button>
-    </div>
   </div>
 
-  <!-- LOADING — same footprint as input (ghost presets row keeps height) -->
+  <!-- LOADING -->
   <div data-panel="loading" class="q-panel" hidden>
     <div class="q-loading">
       <div class="q-spinner" aria-hidden="true"></div>
@@ -47,9 +40,6 @@ const roofPath =
         <div class="q-loading-text">Measuring your roof from satellite…</div>
         <div class="q-loading-addr" data-loading-addr></div>
       </div>
-    </div>
-    <div class="q-presets q-presets--ghost" aria-hidden="true">
-      <span class="q-sample">Try it free</span>
     </div>
   </div>
 
@@ -111,20 +101,22 @@ const roofPath =
     backdrop-filter: blur(calc(30px - var(--q-m) * 8px)) saturate(calc(1.8 - var(--q-m) * 0.2));
     -webkit-backdrop-filter: blur(calc(30px - var(--q-m) * 8px)) saturate(calc(1.8 - var(--q-m) * 0.2));
     border: 1px solid rgba(255, 255, 255, calc(0.6 + var(--q-m) * 0.15));
-    border-radius: calc(28px - var(--q-m) * 20px);
-    padding: calc(18px - var(--q-m) * 12px);
+    border-radius: calc(28px + var(--q-m) * 52px);
+    padding: calc(18px - var(--q-m) * 18px);
     box-shadow:
       0 1px 0 rgba(255, 255, 255, 0.7) inset,
       0 2px 6px rgba(16, 24, 40, calc(0.05 + var(--q-m) * 0.02)),
       0 calc(40px - var(--q-m) * 28px) calc(80px - var(--q-m) * 50px) calc(-32px + var(--q-m) * 16px) rgba(23, 60, 160, calc(0.45 - var(--q-m) * 0.1));
   }
-  /* Merging into the glass nav — drop own chrome so one pill reads as one surface */
+  /*
+    Merging into the glass nav — continuous via --q-m.
+    Hard class only late: single-row layout + drop own chrome so one surface remains.
+  */
   .q.is-collapsing,
   .q[data-docked="1"] {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    border-radius: 999px;
     padding: 0;
     box-sizing: border-box;
     background: rgba(255, 255, 255, calc(0.5 * (1 - var(--q-m))));
@@ -196,21 +188,15 @@ const roofPath =
     margin-right: 0;
     min-height: 40px;
     height: 40px;
-    padding: 0 18px;
+    padding: 0 14px;
     border-radius: 999px;
     gap: 0;
+    font-size: 13px;
   }
-  .q.is-collapsing .q-go-full,
+  /* Same label always — only the arrow yields for space */
   .q.is-collapsing .q-go-arrow,
-  .q[data-docked="1"] .q-go-full,
   .q[data-docked="1"] .q-go-arrow {
     display: none !important;
-  }
-  .q.is-collapsing .q-go-short,
-  .q[data-docked="1"] .q-go-short {
-    display: inline !important;
-    max-width: none;
-    opacity: 1;
   }
   .q.is-collapsing .q-search input,
   .q[data-docked="1"] .q-search input {
@@ -279,7 +265,7 @@ const roofPath =
     will-change: opacity, transform;
   }
 
-  /* search bar — merges into the outer pill as morph rises */
+  /* search bar — softens into the nav trail; radius stays soft-rect until late */
   .q-search {
     position: relative;
     display: flex;
@@ -287,7 +273,7 @@ const roofPath =
     gap: calc(10px - var(--q-m) * 2px);
     background: rgba(255, 255, 255, calc(0.85 - var(--q-m) * 0.85));
     border: 1px solid rgba(255, 255, 255, calc(0.9 - var(--q-m) * 0.9));
-    border-radius: calc(18px + var(--q-m) * 981px);
+    border-radius: calc(18px + var(--q-m) * 22px);
     padding:
       calc(8px - var(--q-m) * 8px)
       calc(8px - var(--q-m) * 8px)
@@ -332,47 +318,27 @@ const roofPath =
     font-weight: 600;
     font-size: calc(14px - var(--q-m) * 1px);
     padding: calc(10px - var(--q-m) * 2px) calc(16px - var(--q-m) * 2px);
-    border-radius: calc(13px + var(--q-m) * 986px);
+    border-radius: calc(13px + var(--q-m) * 27px);
     box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset, 0 8px 18px -6px rgba(31,87,240,0.55);
     cursor: pointer;
     transition: filter 0.16s ease;
     overflow: hidden;
+    white-space: nowrap;
   }
   .q-go:hover { filter: brightness(1.05); }
-  /* Both labels in-flow — widths collapse so the button shrinks and stays right-flush */
-  .q-go-full {
+  /* One label the whole journey — no mid-morph copy swap */
+  .q-go-label {
     display: inline-block;
-    max-width: calc((1 - var(--q-m)) * 13em);
-    opacity: calc(1 - var(--q-m) * 1.25);
-    overflow: hidden;
     white-space: nowrap;
-    vertical-align: bottom;
-  }
-  .q-go-short {
-    display: inline-block;
-    max-width: calc(var(--q-m) * 5.5em);
-    opacity: calc(var(--q-m) * 1.15);
-    overflow: hidden;
-    white-space: nowrap;
-    vertical-align: bottom;
   }
   .q-go-arrow {
     display: inline-block;
     max-width: calc((1 - var(--q-m)) * 18px);
-    opacity: calc(1 - var(--q-m) * 1.4);
+    opacity: calc(1 - var(--q-m) * 1.35);
     overflow: hidden;
     margin-left: calc(7px * (1 - var(--q-m)));
     vertical-align: middle;
-  }
-  .q[data-docked="1"] .q-go-full,
-  .q[data-docked="1"] .q-go-arrow {
-    max-width: 0;
-    opacity: 0;
-    margin: 0;
-  }
-  .q[data-docked="1"] .q-go-short {
-    max-width: 5.5em;
-    opacity: 1;
+    flex: none;
   }
 
   .q-presets {
@@ -420,8 +386,8 @@ const roofPath =
 
   @media (max-width: 520px) {
     .q {
-      border-radius: calc(20px - var(--q-m) * 12px);
-      padding: calc(12px - var(--q-m) * 6px);
+      border-radius: calc(20px + var(--q-m) * 60px);
+      padding: calc(12px - var(--q-m) * 12px);
       /* Glassier on mobile: more translucent so the blob frosts through */
       background: rgba(255, 255, 255, calc(0.38 + var(--q-m) * 0.34));
       backdrop-filter: blur(26px) saturate(1.9);
@@ -1127,12 +1093,6 @@ const roofPath =
 
     goBtn.addEventListener("click", run);
     input.addEventListener("keydown", (e) => { if (e.key === "Enter") run(); });
-    card.querySelectorAll("[data-preset]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        input.value = (btn as HTMLElement).dataset.preset || "";
-        run();
-      });
-    });
     resetBtn.addEventListener("click", () => {
       dismissOpenCard({ clear: true, focus: true });
     });
