@@ -11,7 +11,7 @@ const roofPath =
   <!-- INPUT -->
   <div data-panel="input" class="q-panel">
     <div class="q-search">
-      <label class="q-sr-only" for="quoter-address">Home address</label>
+      <label class="q-sr-only" for="quoter-address">Property address</label>
       <svg class="q-search-icon" width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11Z" stroke="#6b7280" stroke-width="2" stroke-linejoin="round"/>
         <circle cx="12" cy="10" r="2.5" stroke="#6b7280" stroke-width="2"/>
@@ -24,9 +24,9 @@ const roofPath =
         autocomplete="street-address"
         spellcheck="false"
       />
-      <button type="button" data-go class="q-go" aria-label="Get my free quote">
-        <span class="q-go-full">Get my free quote</span>
-        <span class="q-go-short" aria-hidden="true">Measure</span>
+      <button type="button" data-go class="q-go" aria-label="Get my quote">
+        <span class="q-go-full">Get my quote</span>
+        <span class="q-go-short" aria-hidden="true">Quote</span>
         <svg class="q-go-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -34,7 +34,7 @@ const roofPath =
     </div>
     <div class="q-presets">
       <button type="button" class="q-sample" data-preset={sampleAddress}>
-        Try a sample address
+        Try it free
       </button>
     </div>
   </div>
@@ -49,7 +49,7 @@ const roofPath =
       </div>
     </div>
     <div class="q-presets q-presets--ghost" aria-hidden="true">
-      <span class="q-sample">Try a sample address</span>
+      <span class="q-sample">Try it free</span>
     </div>
   </div>
 
@@ -398,18 +398,19 @@ const roofPath =
     border: 0;
     background: none;
     padding: 4px 2px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--color-ink-soft);
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: var(--color-brand-600);
     text-decoration: underline;
-    text-decoration-color: rgba(47, 107, 255, 0.35);
+    text-decoration-color: rgba(47, 107, 255, 0.4);
     text-underline-offset: 3px;
     cursor: pointer;
     transition: color 0.15s ease, text-decoration-color 0.15s ease;
   }
   .q-sample:hover {
-    color: var(--color-brand-600);
-    text-decoration-color: rgba(47, 107, 255, 0.7);
+    color: var(--color-brand-700);
+    text-decoration-color: rgba(47, 107, 255, 0.75);
   }
   .q-sample:focus-visible {
     outline: 2px solid var(--color-brand-500);
