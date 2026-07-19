@@ -27,11 +27,11 @@ const meetingUrl = "https://cal.com/";
   <span class="meeting-fly-label" data-meeting-label>Book a call</span>
 </a>
 
-<!-- Glass chrome for the docked brand + search — no separate nav links/CTA -->
+<!-- Glass chrome for the docked brand. The quote widget is now a sealed
+     iframe and no longer docks here; "Book a call" (meeting-fly) is the
+     element that flies into the nav on scroll. -->
 <div class="glass-nav" data-glass-nav inert style="--nav-merge: 0">
   <span class="glass-nav-brand-slot" data-nav-brand-slot aria-hidden="true">Quoter</span>
-  <span class="glass-nav-divider" aria-hidden="true"></span>
-  <div class="widget-dock-slot" data-widget-dock-slot aria-hidden="true"></div>
 </div>
 
 <style>
@@ -987,6 +987,9 @@ const meetingUrl = "https://cal.com/";
     });
   }
 
-  initWidgetMorph();
-  document.addEventListener("astro:after-swap", initWidgetMorph);
+  // Widget dock morph disabled: the quote widget is now a sealed cross-origin
+  // iframe, so it can't collapse its internals into the nav pill the way the
+  // mock did. It stays put in the hero; "Book a call" flies into the nav.
+  // (initWidgetMorph retained above for reference / possible future re-enable.)
+  void initWidgetMorph;
 </script>
