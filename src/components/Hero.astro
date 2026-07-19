@@ -24,7 +24,7 @@ const meetingUrl = "https://cal.com/";
         We'll give potential clients visiting your site accurate, instant quotes using satellite imagery. No matter what size of job it is, we make it quicker and easier for you and your customers to strike a deal.
       </p>
 
-      <div class="hero-widget mx-auto w-full max-w-[620px] widget-load" data-widget-shell>
+      <div class="hero-widget mx-auto w-full max-w-[660px] widget-load" data-widget-shell>
         <!-- Holds layout while #quoter-widget is position:fixed during the dock morph -->
         <div class="hero-widget-spacer" data-widget-spacer aria-hidden="true"></div>
         <LiveWidget />
@@ -388,8 +388,15 @@ const meetingUrl = "https://cal.com/";
         const lenis = window.__lenis;
         if (lenis?.scrollTo) lenis.scrollTo(0, { duration: 1.1 });
         else window.scrollTo({ top: 0, behavior: "smooth" });
+        // The search input lives inside the widget iframe now — focus it
+        // across the frame boundary via the host bridge.
+        const focusEmbed = (window as unknown as { __quoterFocus?: () => void })
+          .__quoterFocus;
         const input = card.querySelector("[data-input]") as HTMLInputElement | null;
-        window.setTimeout(() => input?.focus({ preventScroll: true }), 650);
+        window.setTimeout(() => {
+          if (focusEmbed) focusEmbed();
+          else input?.focus({ preventScroll: true });
+        }, 650);
       });
     });
   }
