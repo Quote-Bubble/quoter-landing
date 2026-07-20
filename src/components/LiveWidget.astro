@@ -71,6 +71,17 @@ const EMBED_SRC =
     // grown iframe floats over the page during suggestions.
     let baseHeight = 0;
 
+    // The hero's brand wordmark + Book-a-call are fixed elements positioned by
+    // scroll/resize handlers off in-flow "spacers". When the widget grows
+    // (flow opens), the layout shifts but those handlers don't re-run until
+    // the next scroll — so the wordmark overlaps until you nudge the page.
+    // Kick the same recompute ourselves whenever the widget's size changes.
+    let lastKick = "";
+    const nudgeHeroLayout = () => {
+      window.dispatchEvent(new Event("resize"));
+      window.dispatchEvent(new Event("scroll"));
+    };
+
     window.addEventListener("message", (e: MessageEvent) => {
       const d = e.data;
       if (!d || d.source !== "quoter-embed") return;
@@ -102,6 +113,15 @@ const EMBED_SRC =
           frame.style.height = `${h}px`;
           if (d.stage === "input") baseHeight = h; // remember the bar height
         }
+      }
+
+      // Whenever the size/stage actually changes, re-run the hero's fixed-
+      // element positioning (fixes the wordmark overlap on first flow-open).
+      const kick = `${d.stage}|${h}|${!!d.overlay}|${!!d.dropdown}`;
+      if (kick !== lastKick) {
+        lastKick = kick;
+        requestAnimationFrame(nudgeHeroLayout);
+        window.setTimeout(nudgeHeroLayout, 80);
       }
     });
 
