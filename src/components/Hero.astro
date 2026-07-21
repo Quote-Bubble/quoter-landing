@@ -246,7 +246,7 @@ const meetingUrl = "https://cal.com/";
   /* Hidden while the widget's flow is open — its own height changes per
      step, and there's no good "level" position to keep this button pinned
      to underneath a box that keeps resizing. Simplest to just not show it. */
-  body:has(#quoter-widget[data-stage="flow"]) .hero-meeting-takeoff {
+  :global(body:has(#quoter-widget[data-stage="flow"])) .hero-meeting-takeoff {
     opacity: 0;
     pointer-events: none;
   }
