@@ -85,10 +85,30 @@ const COLLAPSED_H = 90;
     // the .q iframe transition on the host.
     const PANEL_H = 544;
 
+    // The panel overlays downward and, on a short hero, its bottom lands over
+    // the section below. Push the lower sections down just enough to leave a
+    // clean gap beneath the panel. The gap is computed from the live layout
+    // (scroll-invariant, since both rects shift together), so it adapts to
+    // viewport height and where the bar sits.
+    const lower = document.querySelector<HTMLElement>(".page-lower");
+    const GAP_BELOW_PANEL = 64;
+    function separateLowerSections() {
+      if (!lower) return;
+      // Measure against the panel's natural (unpadded) position.
+      lower.style.paddingTop = "";
+      const panelBottom = holder!.getBoundingClientRect().top + PANEL_H;
+      const lowerTop = lower.getBoundingClientRect().top;
+      const needed = Math.max(0, panelBottom + GAP_BELOW_PANEL - lowerTop);
+      lower.style.paddingTop = `${Math.round(needed)}px`;
+    }
+    function resetLowerSections() {
+      if (lower) lower.style.paddingTop = "";
+    }
+
     // Scroll the page just enough that the expanded panel sits fully in view.
     // The panel overlays downward from the (in-flow) bar, so on a short hero
-    // its bottom lands below the fold / over the next section — nudge down to
-    // reveal it, without pushing its top off the top of the screen.
+    // its bottom lands below the fold — nudge down to reveal it, without
+    // pushing its top off the top of the screen.
     function scrollPanelIntoView() {
       const rect = holder!.getBoundingClientRect();
       const vh = window.innerHeight;
@@ -134,8 +154,7 @@ const COLLAPSED_H = 90;
         "quoter-suggesting",
         mode === "suggesting",
       );
-      // Dim + blur the page behind the panel on desktop expand (mobile uses
-      // its own full-screen overlay).
+      // Marks the expanded state for host CSS (panel elevation).
       document.documentElement.classList.toggle(
         "quoter-expanded",
         mode === "expanded",
@@ -149,9 +168,12 @@ const COLLAPSED_H = 90;
         frame.style.height = `${h}px`;
       }
 
-      // On the transition INTO the expanded panel, bring it fully into view.
-      if (mode === "expanded" && !wasExpanded) {
-        requestAnimationFrame(scrollPanelIntoView);
+      if (mode === "expanded") {
+        // Leave real space beneath the panel, then bring it fully into view.
+        separateLowerSections();
+        if (!wasExpanded) requestAnimationFrame(scrollPanelIntoView);
+      } else {
+        resetLowerSections();
       }
     });
 

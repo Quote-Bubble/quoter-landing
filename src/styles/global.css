@@ -582,28 +582,13 @@ html.quoter-flow-open .meeting-fly {
 
 /* When the widget expands into its panel it overlays downward and can spill
    over the section below (the panel is taller than the hero has room for).
-   Dim + blur everything behind it so it reads as a focused layer instead of a
-   card floating awkwardly over the next section. The widget itself is lifted
-   above the scrim (its iframe keeps its own z-index inside this context). */
-html.quoter-expanded::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 9000;
-  background: rgba(12, 18, 32, 0.32);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  pointer-events: none;
-  animation: quoter-scrim-in 0.3s ease both;
+   Rather than dim the page, we push the lower sections down so there's real
+   separation beneath the panel (the exact amount is computed in JS on expand,
+   applied as padding-top here so it animates in sync with the panel). */
+.page-lower {
+  transition: padding-top 0.34s cubic-bezier(0.22, 1, 0.36, 1);
 }
-@keyframes quoter-scrim-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
+/* Keep the panel above the lower sections while it overlays them. */
 html.quoter-expanded #quoter-widget {
-  z-index: 9001;
+  z-index: 30;
 }
