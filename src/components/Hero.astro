@@ -243,13 +243,12 @@ const meetingUrl = "https://cal.com/";
     visibility: hidden;
     pointer-events: none;
   }
-  /* Hidden while the widget's flow is open — its own height changes per
-     step, and there's no good "level" position to keep this button pinned
-     to underneath a box that keeps resizing. Simplest to just not show it. */
-  :global(body:has(#quoter-widget[data-stage="flow"])) .hero-meeting-takeoff {
-    opacity: 0;
-    pointer-events: none;
-  }
+  /* Hidden while the widget's flow is open (its height changes per step, so
+     there's no stable spot to keep this pinned underneath). This can't be
+     done in pure CSS: the button's `widget-rise` entrance keyframes
+     forwards-fill opacity:1, which outranks normal author rules — so
+     LiveWidget's script sets an inline !important opacity instead. The
+     `opacity` transition above makes that fade smooth. */
 
   /* Once morph boots, the real widget is fixed — spacer is the in-flow box */
   /* Pinned to body by JS — keep styles global so portal still looks right */

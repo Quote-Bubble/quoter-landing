@@ -94,11 +94,34 @@ const EMBED_SRC =
       window.dispatchEvent(new Event("scroll"));
     };
 
+    // Book-a-call lives just below the widget in the hero. While the flow is
+    // open the widget's height changes per step, so there's no stable spot to
+    // keep the button aligned underneath — just hide it. A pure CSS rule can't
+    // win here: the button's entrance keyframes (`widget-rise`) forwards-fill
+    // opacity:1, which outranks any normal author declaration in the cascade.
+    // An inline !important style does outrank a filled animation, so drive it
+    // from JS where we already know the stage.
+    const meetingBtn = document.querySelector<HTMLElement>(
+      ".hero-meeting-takeoff",
+    );
+    const setMeetingHidden = (hidden: boolean) => {
+      if (!meetingBtn) return;
+      if (hidden) {
+        meetingBtn.style.setProperty("opacity", "0", "important");
+        meetingBtn.style.setProperty("pointer-events", "none", "important");
+      } else {
+        meetingBtn.style.removeProperty("opacity");
+        meetingBtn.style.removeProperty("pointer-events");
+      }
+    };
+
     window.addEventListener("message", (e: MessageEvent) => {
       const d = e.data;
       if (!d || d.source !== "quoter-embed") return;
       // Mirror stage so #quoter-widget[data-stage] selectors keep working.
       if (typeof d.stage === "string") holder.dataset.stage = d.stage;
+      // Hide Book-a-call whenever the flow is open (any non-input stage).
+      setMeetingHidden(d.stage === "flow");
 
       const h = typeof d.height === "number" && d.height > 0 ? d.height : 0;
 
