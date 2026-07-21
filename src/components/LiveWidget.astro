@@ -2,70 +2,72 @@
 // The real, working Quoter widget — embedded via iframe from
 // quoter-widget-frontend. Replaces the former in-page mock.
 //
-// The iframe is a sealed cross-origin box (that isolation is exactly what
-// makes it safe to embed on roofer sites), so it's bridged to the hero's
-// dock-morph and focus logic with a small postMessage handshake:
-//   embed -> host : { source:"quoter-embed", stage, height, overlay }
+// The widget has exactly two on-screen sizes: a fixed collapsed search bar
+// and a fixed expanded panel. The iframe is ALWAYS absolutely positioned over
+// a reserved, constant-height slot, so no size change the widget makes ever
+// moves anything on the host page. The panel simply overlays downward, like a
+// dropdown. This is what killed the whole class of layout bugs (the Book-a-call
+// gap, the hero jump, the morph recomputes) that the old dynamic-resize iframe
+// caused.
+//
+//   embed -> host : { source:"quoter-embed", mode, height, stage }
 //   host  -> embed: { source:"quoter-host", action:"focus" }
-// `stage` is mirrored onto this #quoter-widget element so every existing
-// selector and the nav dock-morph keep working unchanged.
+//
+// mode is one of: collapsed | suggesting | expanded | overlay. `stage` is
+// mirrored onto #quoter-widget so existing selectors keep working.
 const EMBED_SRC =
   "https://quoter-widget-frontend.vercel.app/embed?roofer=quoter-landing-demo";
+
+// Keep in sync with QUOTE_SIZES in the widget repo (lib/motion.ts).
+const COLLAPSED_H = 90;
 ---
 
-<div class="q" id="quoter-widget" data-stage="input">
+<div class="q" id="quoter-widget" data-stage="input" data-mode="collapsed">
   <iframe
     data-quoter-frame
     src={EMBED_SRC}
     title="Get an instant, free roof quote"
     loading="eager"
     scrolling="no"
+    style={`height:${COLLAPSED_H}px`}
   ></iframe>
 </div>
 
-<style>
-  /* No card chrome here — the widget brings its own glass card inside the
-     iframe. This element is just the morph target and sizing host. */
+<style define:vars={{ collapsedH: `${COLLAPSED_H}px` }}>
+  /* Reserved slot: a fixed height that never changes, so surrounding
+     elements (Book a call, the scroll cue) never move. */
   .q {
     position: relative;
     width: 100%;
+    height: var(--collapsedH);
   }
+  /* The iframe is ALWAYS absolute over the slot, so growing it (suggestions,
+     panel) overlays the page instead of pushing it. */
   .q iframe {
-    display: block;
-    width: 100%;
-    /* Starts near the widget's real collapsed height (its own search-bar
-       math: ~38px card chrome + ~52px search row) instead of 0. The embed's
-       first postMessage still corrects this to the exact value, but starting
-       close means that correction is a few px, not a 0->90px snap. On the
-       hero, .hero-stage vertically centers the whole cluster (wordmark,
-       copy, widget) - a snap to real height while the wordmark's entrance
-       animation is still playing re-centers the cluster and reads as the
-       wordmark "jumping". The transition below smooths any leftover delta. */
-    height: 90px;
-    /* Matches the widget's own internal SHELL_TRANSITION (380ms, ease-soft)
-       so the host-side height and the widget's own animated content stay
-       roughly in sync instead of visibly racing each other. */
-    transition: height 380ms var(--ease-out-soft, ease);
-    border: 0;
-    background: transparent;
-  }
-  /* Suggestions open: the iframe grows but floats ON TOP of the content
-     below (Book a call, scroll cue) instead of pushing it — the host keeps
-     the search bar's footprint so nothing shifts. */
-  .q.is-suggesting iframe {
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: var(--collapsedH);
+    border: 0;
+    background: transparent;
+    /* Matches the widget's internal SHELL_TRANSITION (320ms, ease-soft) so
+       the iframe and the card inside it grow/shrink in lockstep. */
+    transition: height 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* Suggestions dropdown / expanded panel float above the content below. */
+  .q[data-mode="suggesting"] iframe,
+  .q[data-mode="expanded"] iframe {
     z-index: 60;
   }
-  /* Mobile flow needs the whole screen; the embed asks for overlay and we
-     pin the iframe to the viewport. */
-  .q.is-overlay iframe {
+  /* Mobile flow needs the whole screen. */
+  .q[data-mode="overlay"] iframe {
     position: fixed;
     inset: 0;
     width: 100vw;
     height: 100dvh;
     z-index: 9999;
+    transition: none;
   }
 </style>
 
@@ -79,69 +81,37 @@ const EMBED_SRC =
     ) as HTMLIFrameElement | null;
     if (!frame) return;
 
-    // The search bar's own height, so we can hold its footprint while the
-    // grown iframe floats over the page during suggestions.
-    let baseHeight = 0;
-
-    // The hero's brand wordmark + Book-a-call are fixed elements positioned by
-    // scroll/resize handlers off in-flow "spacers". When the widget grows
-    // (flow opens), the layout shifts but those handlers don't re-run until
-    // the next scroll — so the wordmark overlaps until you nudge the page.
-    // Kick the same recompute ourselves whenever the widget's size changes.
-    let lastKick = "";
-    const nudgeHeroLayout = () => {
-      window.dispatchEvent(new Event("resize"));
-      window.dispatchEvent(new Event("scroll"));
-    };
-
     window.addEventListener("message", (e: MessageEvent) => {
       const d = e.data;
       if (!d || d.source !== "quoter-embed") return;
-      // Mirror stage so #quoter-widget[data-stage] selectors keep working.
-      if (typeof d.stage === "string") holder.dataset.stage = d.stage;
-      // Hide "Book a call" whenever the flow is open. This toggles a class on
-      // <html> that the global stylesheet uses to hide BOTH the hero button
-      // and the nav's flying clone (.meeting-fly) — the clone is what's
-      // actually on screen once the dock morph has booted.
-      document.documentElement.classList.toggle(
-        "quoter-flow-open",
-        d.stage === "flow",
-      );
 
+      const mode = typeof d.mode === "string" ? d.mode : "collapsed";
       const h = typeof d.height === "number" && d.height > 0 ? d.height : 0;
 
-      if (d.overlay) {
-        // Mobile flow — full-screen the iframe.
-        holder.classList.add("is-overlay");
-        holder.classList.remove("is-suggesting");
-        document.documentElement.classList.remove("quoter-suggesting");
-      } else if (d.dropdown) {
-        // Suggestions open — float the iframe over the page, hold the
-        // search bar's footprint, and hide Book-a-call while typing.
-        holder.classList.remove("is-overlay");
-        holder.classList.add("is-suggesting");
-        document.documentElement.classList.add("quoter-suggesting");
-        if (baseHeight) holder.style.height = `${baseHeight}px`;
-        if (h) frame.style.height = `${h}px`;
-      } else {
-        // Normal: iframe sits in flow at its content height.
-        holder.classList.remove("is-overlay");
-        holder.classList.remove("is-suggesting");
-        document.documentElement.classList.remove("quoter-suggesting");
-        holder.style.height = "";
-        if (h) {
-          frame.style.height = `${h}px`;
-          if (d.stage === "input") baseHeight = h; // remember the bar height
-        }
-      }
+      // Mirror stage + mode so host CSS/selectors keep working.
+      if (typeof d.stage === "string") holder.dataset.stage = d.stage;
+      holder.dataset.mode = mode;
 
-      // Whenever the size/stage actually changes, re-run the hero's fixed-
-      // element positioning (fixes the wordmark overlap on first flow-open).
-      const kick = `${d.stage}|${h}|${!!d.overlay}|${!!d.dropdown}`;
-      if (kick !== lastKick) {
-        lastKick = kick;
-        requestAnimationFrame(nudgeHeroLayout);
-        window.setTimeout(nudgeHeroLayout, 80);
+      // Hide Book-a-call whenever the widget isn't a plain collapsed bar:
+      //  - expanded / overlay (flow open): the panel covers that area anyway.
+      //  - suggesting: the dropdown floats over it.
+      // Both toggles map to the same global.css rules that hide the button
+      // and its nav flying-clone.
+      document.documentElement.classList.toggle(
+        "quoter-flow-open",
+        mode === "expanded" || mode === "overlay",
+      );
+      document.documentElement.classList.toggle(
+        "quoter-suggesting",
+        mode === "suggesting",
+      );
+
+      // Drive the iframe height. Overlay (mobile) is fully CSS-driven, so
+      // clear any inline height left over from a previous mode.
+      if (mode === "overlay") {
+        frame.style.height = "";
+      } else if (h) {
+        frame.style.height = `${h}px`;
       }
     });
 
