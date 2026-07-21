@@ -219,6 +219,7 @@ const meetingUrl = "https://cal.com/";
       0 8px 20px -8px rgba(31, 87, 240, 0.5);
     box-sizing: border-box;
     transition:
+      opacity 0.22s ease,
       filter 0.25s ease,
       transform 0.35s var(--ease-out-expo, ease),
       box-shadow 0.35s var(--ease-out-expo, ease);
@@ -240,6 +241,13 @@ const meetingUrl = "https://cal.com/";
   /* Hidden once the fixed flyer is placed — no mid-scroll handoff flash */
   :global(html.is-meeting-morphing) .hero-meeting-takeoff {
     visibility: hidden;
+    pointer-events: none;
+  }
+  /* Hidden while the widget's flow is open — its own height changes per
+     step, and there's no good "level" position to keep this button pinned
+     to underneath a box that keeps resizing. Simplest to just not show it. */
+  body:has(#quoter-widget[data-stage="flow"]) .hero-meeting-takeoff {
+    opacity: 0;
     pointer-events: none;
   }
 
