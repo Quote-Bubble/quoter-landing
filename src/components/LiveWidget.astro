@@ -33,7 +33,19 @@ const EMBED_SRC =
   .q iframe {
     display: block;
     width: 100%;
-    height: 0; /* driven by the embed's postMessage */
+    /* Starts near the widget's real collapsed height (its own search-bar
+       math: ~38px card chrome + ~52px search row) instead of 0. The embed's
+       first postMessage still corrects this to the exact value, but starting
+       close means that correction is a few px, not a 0->90px snap. On the
+       hero, .hero-stage vertically centers the whole cluster (wordmark,
+       copy, widget) - a snap to real height while the wordmark's entrance
+       animation is still playing re-centers the cluster and reads as the
+       wordmark "jumping". The transition below smooths any leftover delta. */
+    height: 90px;
+    /* Matches the widget's own internal SHELL_TRANSITION (380ms, ease-soft)
+       so the host-side height and the widget's own animated content stay
+       roughly in sync instead of visibly racing each other. */
+    transition: height 380ms var(--ease-out-soft, ease);
     border: 0;
     background: transparent;
   }
