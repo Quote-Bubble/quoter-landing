@@ -243,12 +243,10 @@ const meetingUrl = "https://cal.com/";
     visibility: hidden;
     pointer-events: none;
   }
-  /* Hidden while the widget's flow is open (its height changes per step, so
-     there's no stable spot to keep this pinned underneath). This can't be
-     done in pure CSS: the button's `widget-rise` entrance keyframes
-     forwards-fill opacity:1, which outranks normal author rules — so
-     LiveWidget's script sets an inline !important opacity instead. The
-     `opacity` transition above makes that fade smooth. */
+  /* Hidden while the widget's flow is open — see the html.quoter-flow-open
+     rules in global.css, which cover both this button and the nav's flying
+     clone (.meeting-fly), the latter being what's actually on screen once the
+     dock morph boots. The `opacity` transition above makes that fade smooth. */
 
   /* Once morph boots, the real widget is fixed — spacer is the in-flow box */
   /* Pinned to body by JS — keep styles global so portal still looks right */

@@ -566,3 +566,16 @@ html.quoter-suggesting .meeting-fly {
   pointer-events: none !important;
   transition: opacity 0.15s ease;
 }
+
+/* While the widget's flow is open the widget height changes per step, so
+   there's no stable spot to keep "Book a call" aligned beneath it — hide it.
+   Once the morph boots, the visible button is the .meeting-fly clone (the
+   original .hero-meeting-takeoff is already visibility:hidden), so both must
+   be covered. !important is required: the flyer is painted with inline styles
+   and the original's entrance keyframes forwards-fill opacity:1. */
+html.quoter-flow-open .hero-meeting-takeoff,
+html.quoter-flow-open .meeting-fly {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.2s ease;
+}
