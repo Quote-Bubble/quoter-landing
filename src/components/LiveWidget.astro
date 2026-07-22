@@ -81,6 +81,18 @@ const COLLAPSED_H = 90;
     ) as HTMLIFrameElement | null;
     if (!frame) return;
 
+    // Only trust messages that actually came from the widget's origin. The
+    // `source: "quoter-embed"` marker below is just a field inside the payload
+    // — any page or iframe can send that — so it identifies the protocol, it
+    // does not authenticate the sender. Derived from the iframe's own src so
+    // it stays correct if the embed moves.
+    let embedOrigin: string | null = null;
+    try {
+      embedOrigin = new URL(frame.src, window.location.href).origin;
+    } catch {
+      return; // unparseable src — don't listen at all rather than listen to everyone
+    }
+
     // Expanded panel height — keep in sync with the widget's QUOTE_SIZES and
     // the .q iframe transition on the host.
     const PANEL_H = 544;
@@ -130,6 +142,7 @@ const COLLAPSED_H = 90;
     }
 
     window.addEventListener("message", (e: MessageEvent) => {
+      if (e.origin !== embedOrigin) return;
       const d = e.data;
       if (!d || d.source !== "quoter-embed") return;
 
