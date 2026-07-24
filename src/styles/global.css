@@ -564,6 +564,7 @@ html.quoter-suggesting .hero-meeting-takeoff,
 html.quoter-suggesting .meeting-fly {
   opacity: 0 !important;
   pointer-events: none !important;
+  visibility: hidden;
   transition: opacity 0.15s ease;
 }
 
@@ -577,6 +578,7 @@ html.quoter-flow-open .hero-meeting-takeoff,
 html.quoter-flow-open .meeting-fly {
   opacity: 0 !important;
   pointer-events: none !important;
+  visibility: hidden;
   transition: opacity 0.2s ease;
 }
 

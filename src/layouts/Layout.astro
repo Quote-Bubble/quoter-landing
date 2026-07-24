@@ -96,6 +96,7 @@ const {
     // Anchor links ride the same curve
     document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
       a.addEventListener("click", (e) => {
+        if (!a.hash || a.hash === "#") return;
         const target = document.querySelector(a.hash);
         if (!target) return;
         e.preventDefault();

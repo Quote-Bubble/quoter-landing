@@ -2,7 +2,7 @@
 // Satellite section — zoom in, then the original scan + outline.
 //
 // To set the roof outline:
-// 1. npm run dev → open http://localhost:4321/trace-roof.html
+// 1. Open tools/trace-roof.html in a browser (dev helper; not publicly served)
 // 2. Click clockwise around the outer eaves (~20–40 points)
 // 3. Close shape → Copy path → paste into roofPath below
 const roofPath =
@@ -757,20 +757,38 @@ void main() {
         return;
       }
 
-      // Run from page load — but let the hero bloom own the GPU for its
-      // first beat, then warm the clouds (still long before the user can
-      // scroll down to them). Only pause when the tab itself is hidden.
+      // Run once the canvas is on-screen — but let the hero bloom own the
+      // GPU for its first beat, then warm the clouds. Pause when scrolled
+      // offscreen or when the tab itself is hidden.
+      let onScreen = false;
+      let pageVisible = !document.hidden;
+      let warmReady = false;
+
+      const sync = () => {
+        if (warmReady && onScreen && pageVisible) start();
+        else stop();
+      };
+
       window.setTimeout(() => {
-        if (!document.hidden) start();
+        warmReady = true;
+        sync();
       }, 1500);
+
+      new IntersectionObserver(
+        ([entry]) => {
+          onScreen = !!entry?.isIntersecting;
+          sync();
+        },
+        { rootMargin: "10% 0px" },
+      ).observe(canvas);
 
       document.addEventListener(
         "visibilitychange",
         () => {
-          if (document.hidden) stop();
-          else start();
+          pageVisible = !document.hidden;
+          sync();
         },
-        { passive: true }
+        { passive: true },
       );
 
       let resizeTimer = 0;

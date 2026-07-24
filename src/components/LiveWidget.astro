@@ -29,6 +29,7 @@ const COLLAPSED_H = 120;
     title="Get an instant, free roof quote"
     loading="eager"
     scrolling="no"
+    sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
     style={`height:${COLLAPSED_H}px`}
   ></iframe>
 </div>
@@ -93,9 +94,10 @@ const COLLAPSED_H = 120;
       return; // unparseable src — don't listen at all rather than listen to everyone
     }
 
-    // Expanded panel height — keep in sync with the widget's QUOTE_SIZES and
-    // the .q iframe transition on the host.
-    const PANEL_H = 544;
+    // Expanded iframe height — fallback synced with QUOTE_SIZES.expanded
+    // (expandedPanel 544 + shadow room). Prefer the live height EmbedFrame
+    // posts so host layout stays correct if the widget changes sizes.
+    let panelH = 574;
 
     // The panel overlays downward and, on a short hero, its bottom lands over
     // the section below. Push the lower sections down just enough to leave a
@@ -108,7 +110,7 @@ const COLLAPSED_H = 120;
       if (!lower) return;
       // Measure against the panel's natural (unpadded) position.
       lower.style.paddingTop = "";
-      const panelBottom = holder!.getBoundingClientRect().top + PANEL_H;
+      const panelBottom = holder!.getBoundingClientRect().top + panelH;
       const lowerTop = lower.getBoundingClientRect().top;
       const needed = Math.max(0, panelBottom + GAP_BELOW_PANEL - lowerTop);
       lower.style.paddingTop = `${Math.round(needed)}px`;
@@ -126,7 +128,7 @@ const COLLAPSED_H = 120;
       const vh = window.innerHeight;
       const topMargin = 24;
       const bottomMargin = 24;
-      const panelBottom = rect.top + PANEL_H;
+      const panelBottom = rect.top + panelH;
       let delta = panelBottom - (vh - bottomMargin);
       if (delta <= 4) return;
       // Never scroll so far that the panel's own top goes above topMargin.
@@ -153,6 +155,9 @@ const COLLAPSED_H = 120;
       // Mirror stage + mode so host CSS/selectors keep working.
       if (typeof d.stage === "string") holder.dataset.stage = d.stage;
       holder.dataset.mode = mode;
+
+      // Prefer the height EmbedFrame reports for expanded layout math.
+      if (mode === "expanded" && h) panelH = h;
 
       // Hide Book-a-call whenever the widget isn't a plain collapsed bar:
       //  - expanded / overlay (flow open): the panel covers that area anyway.
@@ -194,7 +199,7 @@ const COLLAPSED_H = 120;
     (window as unknown as { __quoterFocus?: () => void }).__quoterFocus = () => {
       frame.contentWindow?.postMessage(
         { source: "quoter-host", action: "focus" },
-        "*",
+        embedOrigin!,
       );
     };
   }
