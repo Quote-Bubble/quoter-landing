@@ -15,6 +15,11 @@
 //
 // mode is one of: collapsed | suggesting | expanded | overlay. `stage` is
 // mirrored onto #quoter-widget so existing selectors keep working.
+// ⚠️ COUPLED WITH vercel.json — the CSP `frame-src` there MUST list this exact
+// origin or the browser silently blocks this iframe (no error on the page, only
+// a CSP violation in the console). If you ever move the widget to a new URL
+// (e.g. a custom domain), change it in BOTH places. vercel.json can't read an
+// env var, so this stays a manual, hand-kept pair.
 const EMBED_SRC =
   "https://quoter-widget-frontend.vercel.app/embed?roofer=quoter-landing-demo";
 
